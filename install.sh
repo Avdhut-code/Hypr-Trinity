@@ -443,8 +443,10 @@ vscodeInstall() {
 			
 			if command -v code &>/dev/null; then
 				log_info "Now installing vscode theme"
-				mkfdir -p "${HOME}/.vscode/extensions"
+				mkdir -p "${HOME}/.vscode/extensions"
 				code --install-extension 'viktorqvarfordt.vscode-pitch-black-theme' 2>/dev/null && log_success "VSCode Pitch Black theme installed" || log_warning "Failed to install VSCode Pitch Black theme"	
+				
+				sed -i 's/"workbench.colorTheme": ".*"/"workbench.colorTheme": "Pitch Black"/' ~/.config/Code/User/settings.json
 			fi	
 		else
 			log_warning "Failed to download VSCode"
