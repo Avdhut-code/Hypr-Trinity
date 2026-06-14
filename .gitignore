@@ -1,7 +1,3 @@
-# Installation & Backup Artifacts
-uninstall-manifest.txt
-OriginalConfigFolders/
-
 # System & IDE
 .DS_Store
 *.swp
@@ -13,7 +9,3 @@ OriginalConfigFolders/
 # OS
 Thumbs.db
 .env.local
-
-# for me as instructions
-demoInstall.sh
-someSelfInstruction.txt
