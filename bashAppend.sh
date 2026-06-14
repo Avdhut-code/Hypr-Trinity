@@ -18,9 +18,6 @@ function lk {
 # System tools environment variables
 export CURRENT_WALLPAPER="${TARGET_DIR}/wallpaper/wall1.png"
 
-# this is for tool codecho
-export DEFAULT_FILE=""
-
 # function get_bright() {
 #   sudo ddcutil getvcp 10 | grep -oP 'current value =\s+\K\d+'
 # }
