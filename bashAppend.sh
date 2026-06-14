@@ -1,13 +1,9 @@
 # === HYPRLAND CONFIG START ===
 
+export PATH="$HOME/.local/bin:$PATH"
+
 # Point to the permanent dotfiles suite location
 export TARGET_DIR="$HOME/.local/share/LinuxMintHyprlandConfig/"
-
-# Uncomment if you want to show neofetch on terminal intitalization/opening
-#if command -v neofetch >/dev/null 2>&1; then
-#    neofetch
-#    printf "\e[1A"
-#fi
 
 # env's for walk configuration/customization
 export EDITOR=vim
@@ -31,7 +27,9 @@ export DEFAULT_FILE=""
 # export BRIGHTNESS=$(get_bright)
 
 # Make prompt bright bold neon green,purple keep output white.
+
 # PS1=' \[\033[1;32m\]\w >\[\033[0m\] ' ## neon-green
+
 PS1=' \[\033[38;5;141m\]\w >\[\033[0m\] ' ## neon-purple
 
 function q {

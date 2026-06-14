@@ -16,7 +16,7 @@ window {
 
 #outer-box {
     margin: 10px;
-    background-color : #000000;
+    background-color: #000000;
 }
 
 #scroll {
@@ -43,10 +43,7 @@ window {
 
 #entry:selected {
     align-items: center;
-    /*flex-start | flex-end | baseline | stretch*/
     background-color: white;
-    /* Selected item background */
     color: black;
-    /* Selected item text color */
     border-radius: 4px;
 }

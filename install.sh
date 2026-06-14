@@ -62,6 +62,7 @@ installPackage(){
 		btop \
 		htop \
 		libnotify-bin \
+		sway-notification-center \
 		pavucontrol \
 		wireplumber \
 		pipewire \
@@ -73,12 +74,12 @@ installPackage(){
 		evince \
 		xed \
 		nemo \
-		mpv
+		mpv \
+		wlrctl
+
 	sudo apt autoremove -y
 	sudo apt clean -y
 
-		# swaync \
-		# gnome-calendar \
 	log_success "System packages installed successfully"
 }
 
@@ -131,28 +132,26 @@ simlinkCreate() {
 	ln -sfn "${TARGET_DIR}/config/waybar" 	"${HOME}/.config/"
 	ln -sfn "${TARGET_DIR}/config/wofi" 	"${HOME}/.config/"
 	ln -sfn "${TARGET_DIR}/config/btop" 	"${HOME}/.config/"
+	ln -sfn "${TARGET_DIR}/config/swaync" 	"${HOME}/.config/"
+
 
 	log_info "Scripts to ~/.local/bin:"
 
 	mkdir -p "${HOME}/.local/bin"
 
-	ln -sfn "${TARGET_DIR}/bin/brightnessCheck.sh"    "${HOME}/.local/bin/brightnessCheck"
-	ln -sfn "${TARGET_DIR}/bin/codecho.sh"            "${HOME}/.local/bin/codecho"
-	ln -sfn "${TARGET_DIR}/bin/custom-launch-btop.sh" "${HOME}/.local/bin/custom-launch-btop"
-	ln -sfn "${TARGET_DIR}/bin/custom-open-link.sh"   "${HOME}/.local/bin/custom-open-link"
-	ln -sfn "${TARGET_DIR}/bin/gnome-terExit.sh"      "${HOME}/.local/bin/gnome-terExit"
-	ln -sfn "${TARGET_DIR}/bin/startup.sh"            "${HOME}/.local/bin/startup"
-	ln -sfn "${TARGET_DIR}/bin/wofiDrawer.sh"         "${HOME}/.local/bin/wofiDrawer"
+	ln -sfn "${TARGET_DIR}/bin/custombrightnessctl.sh"      "${HOME}/.local/bin/custombrightnessctl"
+	ln -sfn "${TARGET_DIR}/bin/custombtoplauncher.sh" 	"${HOME}/.local/bin/custombtoplauncher"
+	ln -sfn "${TARGET_DIR}/bin/customlinkopenr.sh"   	"${HOME}/.local/bin/customlinkopenr"
+	ln -sfn "${TARGET_DIR}/bin/customhyprlandexit.sh"       "${HOME}/.local/bin/customhyprlandexit"
+	ln -sfn "${TARGET_DIR}/bin/customwofisearch.sh"         "${HOME}/.local/bin/customwofisearch"
 
 	log_info "Setting script permissions..."
 	
-	chmod +x "${TARGET_DIR}/bin/brightnessCheck.sh"
-	chmod +x "${TARGET_DIR}/bin/codecho.sh"
-	chmod +x "${TARGET_DIR}/bin/custom-launch-btop.sh"
-	chmod +x "${TARGET_DIR}/bin/custom-open-link.sh"
-	chmod +x "${TARGET_DIR}/bin/gnome-terExit.sh"
-	chmod +x "${TARGET_DIR}/bin/startup.sh"
-	chmod +x "${TARGET_DIR}/bin/wofiDrawer.sh"
+	chmod +x "${TARGET_DIR}/bin/customwofisearch.sh"         
+	chmod +x "${TARGET_DIR}/bin/customhyprlandexit.sh"       
+	chmod +x "${TARGET_DIR}/bin/customlinkopenr.sh"   	
+	chmod +x "${TARGET_DIR}/bin/custombtoplauncher.sh" 	
+	chmod +x "${TARGET_DIR}/bin/custombrightnessctl.sh"      
 
 	log_info "GTK theme:"
 
@@ -183,44 +182,45 @@ bashAppend() {
 }
 
 themeApply() {
-    log_info "Applying GTK theme..."
-    local theme="Graphite-Dark"
+	log_info "Applying GTK theme..."
+	
+	local theme="Graphite-Dark"
 
-    local desktop="${XDG_CURRENT_DESKTOP:-}"
+	local desktop="${XDG_CURRENT_DESKTOP:-}"
 
-    if [ -z "$desktop" ]; then
-        desktop="${DESKTOP_SESSION:-}"
-    fi
+	if [ -z "$desktop" ]; then
+		desktop="${DESKTOP_SESSION:-}"
+	fi
 
-    log_info "Detected desktop: ${desktop:-unknown}"
+	log_info "Detected desktop: ${desktop:-unknown}"
 
-    case "${desktop,,}" in  # ,, = lowercase the string
-        *xfce*)
-            xfconf-query -c xsettings -p /Net/ThemeName -s "$theme" 2>/dev/null \
-                && log_success "XFCE theme set" \
-                || log_warning "xfconf-query failed — install xfce4-settings"
-            ;;
-        *cinnamon*)
-            gsettings set org.cinnamon.desktop.interface gtk-theme "$theme" 2>/dev/null \
-                && log_success "Cinnamon theme set" \
-                || log_warning "Could not set Cinnamon theme"
-            ;;
-        *gnome*)
-            gsettings set org.gnome.desktop.interface gtk-theme "$theme" 2>/dev/null \
-                && log_success "GNOME theme set" \
-                || log_warning "Could not set GNOME theme"
-            ;;
-        *hyprland*|*sway*|*wlroots*)
-            gsettings set org.gnome.desktop.interface gtk-theme "$theme" 2>/dev/null \
-                && log_success "Wayland session theme set" \
-                || log_warning "Could not set theme"
-            ;;
-        *)
-            log_warning "Unknown desktop: '${desktop}' — trying gsettings anyway"
-            gsettings set org.gnome.desktop.interface gtk-theme "$theme" 2>/dev/null \
-                || log_warning "Theme could not be applied, set it manually"
-            ;;
-    esac
+	case "${desktop,,}" in  
+		*xfce*)
+			xfconf-query -c xsettings -p /Net/ThemeName -s "$theme" 2>/dev/null \
+				&& log_success "XFCE theme set" \
+				|| log_warning "xfconf-query failed — install xfce4-settings"
+		;;
+		*cinnamon*)
+			gsettings set org.cinnamon.desktop.interface gtk-theme "$theme" 2>/dev/null \
+				&& log_success "Cinnamon theme set" \
+				|| log_warning "Could not set Cinnamon theme"
+		;;
+		*gnome*)
+			gsettings set org.gnome.desktop.interface gtk-theme "$theme" 2>/dev/null \
+				&& log_success "GNOME theme set" \
+				|| log_warning "Could not set GNOME theme"
+		;;
+		*hyprland*|*sway*|*wlroots*)
+			gsettings set org.gnome.desktop.interface gtk-theme "$theme" 2>/dev/null \
+				&& log_success "Wayland session theme set" \
+				|| log_warning "Could not set theme"
+		;;
+		*)
+			log_warning "Unknown desktop: '${desktop}' — trying gsettings anyway"
+			gsettings set org.gnome.desktop.interface gtk-theme "$theme" 2>/dev/null \
+				|| log_warning "Theme could not be applied, set it manually"
+		;;
+	esac
 }
 
 hyprshotInstall() {
@@ -272,7 +272,7 @@ walkInstall() {
 		return
 	fi
 
-	log_info "Cloning walk..."   #### ADD THE CASE OPTIONAL INSATALL LIKE HYPRSHOT
+	log_info "Cloning walk..."
 
 	echo "  [1] Auto install from GitHub"
 	echo "  [2] Manual install (show instructions)"
@@ -307,7 +307,7 @@ walkInstall() {
 
 }
 
-installObsidian() {
+obsidianInstall() {
 	if command -v obsidian &>/dev/null; then
 		log_success "obsidian is already installed, skipping."
 		return
@@ -320,37 +320,37 @@ installObsidian() {
 	
 	case "$obsidianChoice" in
 	1)
-	log_info "Installing latest version..."
-	
-	local version
+		log_info "Installing latest version..."
+		
+		local version
 
-	version=$(curl -s https://api.github.com/repos/obsidianmd/obsidian-releases/releases/latest \
-		| grep '"tag_name"' | cut -d'"' -f4 | tr -d 'v')
+		version=$(curl -s https://api.github.com/repos/obsidianmd/obsidian-releases/releases/latest \
+			| grep '"tag_name"' | cut -d'"' -f4 | tr -d 'v')
 
-	local deb_url="https://github.com/obsidianmd/obsidian-releases/releases/download/v${version}/obsidian_${version}_amd64.deb"
-	
-	local deb_path="/tmp/obsidian_${version}.deb"
+		local deb_url="https://github.com/obsidianmd/obsidian-releases/releases/download/v${version}/obsidian_${version}_amd64.deb"
+		
+		local deb_path="/tmp/obsidian_${version}.deb"
 
-	if curl -L "$deb_url" -o "$deb_path"; then
-		sudo apt install -y "$deb_path"
-		rm "$deb_path"
-		log_success "Obsidian ${version} installed"
-		log_info "Now you can add the obsidian dark theme to your vault"
-	else
-		log_warning "Failed to download Obsidian, install it manually from https://obsidian.md"
-	fi
+		if curl -L "$deb_url" -o "$deb_path"; then
+			sudo apt install -y "$deb_path"
+			rm "$deb_path"
+			log_success "Obsidian ${version} installed"
+			log_info "Now you can add the obsidian dark theme to your vault"
+		else
+			log_warning "Failed to download Obsidian, install it manually from https://obsidian.md"
+		fi
 	;;
 	2)
-      	echo """
-		Manual Obsidian Installation:
-			1. got to https://obsidian.md/download
-			2. download the appropriate package for you system
-			3. got to the download directory and run "sudo apt install ./obsidian_*.deb"
-			4. install it with "sudo apt install ./path/to/obsidian_*.deb"
-			5. remove the .deb file after installation with "rm ./path/to/obsidian_*.deb"
-			6. Now you can add the obsidian dark theme to your vault
-	"""
-	
+		echo """
+			Manual Obsidian Installation:
+				1. got to https://obsidian.md/download
+				2. download the appropriate package for you system
+				3. got to the download directory and run "sudo a install ./obsidian_*.deb"
+				4. install it with "sudo apt install ./path/to/obsidian_*.deb"
+				5. remove the .deb file after installation with "rm ./path/to/obsidian_*.deb"
+				6. Now you can add the obsidian dark theme to your "VaultName/.obsidian/themes/"
+		"""
+		
 	;;
 	3|*)
 		log_info "Obsidian installation skipped"
@@ -413,6 +413,65 @@ zenInstall() {
 	esac
 }
 
+vscodeInstall() {
+	if command -v code &>/dev/null; then
+		log_success "vscode is already installed, skipping."
+		return
+	fi
+
+	echo "  [1] Auto install from GitHub"
+	echo "  [2] Manual install (show instructions)"
+	echo "  [3] Skip"
+	read -rp "Select option [1/2/3]: " vscodeChoice
+
+	case "$vscodeChoice" in
+	1)
+		log_info "Fetching latest VSCode release..."
+
+		local version
+		version=$(curl -s https://api.github.com/repos/microsoft/vscode/releases/latest \
+		| grep '"tag_name"' | cut -d'"' -f4)
+
+		local deb_url="https://github.com/microsoft/vscode/releases/download/${version}/code_${version}_amd64.deb"
+		local deb_path="/tmp/vscode_${version}.deb"
+
+		log_info "Downloading VSCode ${version}..."
+		if curl -L "$deb_url" -o "$deb_path"; then
+			sudo apt install -y "$deb_path"
+			rm "$deb_path"
+			log_success "VSCode ${version} installed"
+			
+			if command -v code &>/dev/null; then
+				log_info "Now installing vscode theme"
+				mkfdir -p "${HOME}/.vscode/extensions"
+				code --install-extension 'viktorqvarfordt.vscode-pitch-black-theme' 2>/dev/null && log_success "VSCode Pitch Black theme installed" || log_warning "Failed to install VSCode Pitch Black theme"	
+			fi	
+		else
+			log_warning "Failed to download VSCode"
+		fi
+	;;
+	2)
+	echo """
+
+		Manual VSCode Installation:
+			1. Go to https://code.visualstudio.com/Download
+			2. Download the .deb package (x64)
+			3. Install it:
+			sudo apt install -y ~/Downloads/code_*.deb
+
+			Or via curl:
+			1. curl -L "https://code.visualstudio.com/sha/download?build=stable&os=linux-deb-x64" -o /tmp/vscode.deb
+			2. sudo apt install -y /tmp/vscode.deb
+			3. code --version
+
+	"""
+	;;
+	3|*)
+		log_info "VSCode installation skipped"
+	;;
+	esac
+}
+
 main() {
 	log_section "LinuxMintHyprlandConfig Installation"
 
@@ -435,6 +494,7 @@ main() {
 
   	log_section "Pre-Installation Checks"
 	checkIfDebian
+	
 	log_section "System Package Installation"
 	installPackage
 
@@ -460,11 +520,14 @@ main() {
 	walkInstall
 
 	log_section "Obsidian Installation (Optional)"
-	installObsidian
+	obsidianInstall
 
 	log_section "Zen Browser Installation (Optional)"
 	zenInstall
 	
+	log_section "VSCode Installation (Optional)"
+	vscodeInstall
+
 	log_section " Install Done."
 
 	log_success "Installation completed successfully!"

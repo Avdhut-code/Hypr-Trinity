@@ -124,11 +124,11 @@
 		"tooltip": false
 	},
 	"custom/brightness": {
-		"exec": "brightnessCheck",
+		"exec": "custombrightnessctl",
 		"return-type": "",
 		"format": "󰃠  {}%",
 		"interval": "once",
-		"on-click": "brightnessCheck resetToDefault",
+		"on-click": "custombrightnessctl resetToDefault",
 		"signal": 10
 	},
 	"custom/test-widget": {
