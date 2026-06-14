@@ -127,6 +127,8 @@ takePermissions() {
 simlinkCreate() {
 	mkdir -p "${HOME}/.config"
 
+	rmdir -rf "${HOME}/.config/hypr" 2>/dev/null || true
+
 	log_info "Config directories:"
 	ln -sfn "${TARGET_DIR}/config/hypr" 	"${HOME}/.config/"
 	ln -sfn "${TARGET_DIR}/config/waybar" 	"${HOME}/.config/"
