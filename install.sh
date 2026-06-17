@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -euo pipefail # if something fails exit
+set -euo pipefail # IF SOMETHING FAILS EXIT
 
 RED='\033[1;31m'
 GREEN='\033[1;32m'
@@ -9,7 +9,19 @@ BLUE='\033[1;34m'
 NC='\033[0m'
 
 ORIGINAL_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-TARGET_DIR="${HOME}/.local/share/LinuxMintHyprlandConfig"
+
+### CHANGE IT 
+### CHNAGE THIS AS WELL AS CHANGE IN THE WHOLE REPO TO AVOID THE TYPO ERROR OF 'file not found'
+PROJECT_NAME="LinuxMintHyprlandConfig"
+
+TARGET_DIR="${HOME}/.local/share/${PROJECT_NAME}"
+BACKUP_CONFIG_LOCATION="${TARGET_DIR}/backupConfigs"
+
+SKIP_OPTIONAL_INSTALLS=false
+
+IS_DEBIAN=false
+IS_ARCH=false
+IS_FEDORA=false
 
 log_info() {
   	echo -e "${BLUE}[INFO]${NC} $*"
@@ -52,35 +64,96 @@ checkIfDebian() {
 	log_success "System is Debian-based"
 }
 
-installPackage(){
-	log_info "Updating package manager..."
+checkIfArch() {
+	if [ ! -f "${ORIGINAL_DIR}/README.md" ] || [ ! -d "${ORIGINAL_DIR}/config" ]; then
+		exit_with_error "Script must be run from repository root directory"
+	fi
 
-	sudo apt update 
-	sudo apt install -y \
-		git \
+	log_success "Running from correct directory: ${ORIGINAL_DIR}"
+
+	if ! grep -q "^ID=.*arch\|^ID=manjaro" /etc/os-release 2>/dev/null; then
+		exit_with_error "This script only supports Arch-based systems (Arch Linux, Manjaro, etc.)"
+	fi
+
+	log_success "System is Arch-based"
+}
+
+checkIfFedora() {
+	if [ ! -f "${ORIGINAL_DIR}/README.md" ] || [ ! -d "${ORIGINAL_DIR}/config" ]; then
+		exit_with_error "Script must be run from repository root directory"
+	fi
+
+	log_success "Running from correct directory: ${ORIGINAL_DIR}"
+
+	if ! grep -q "^ID=.*fedora" /etc/os-release 2>/dev/null; then
+		exit_with_error "This script only supports Fedora-based systems"
+	fi
+
+	log_success "System is Fedora-based"
+}
+
+installPackagesDebian() {
+    	sudo apt update -y
+    	sudo apt install -y \
+        	git \
 		ddcutil \
 		btop \
 		htop \
 		libnotify-bin \
-		sway-notification-center \
 		pavucontrol \
-		wireplumber \
+        	wireplumber \
 		pipewire \
-		swaybg \
 		playerctl \
-		waybar \
 		wofi \
-		gnome-terminal \
+		swaybg \
+        	gnome-terminal \
 		evince \
 		xed \
 		nemo \
 		mpv \
-		wlrctl
+		curl
+	
+    	sudo apt autoremove -y
+    	sudo apt clean
+}
 
-	sudo apt autoremove -y
-	sudo apt clean -y
+installPackagesArch() {
+    	sudo pacman -Syu --noconfirm
+   	sudo pacman -S --noconfirm \
+        	git ddcutil btop htop libnotify pavucontrol \
+        	wireplumber playerctl wofi swaybg \
+        	gnome-terminal evince gedit nemo mpv curl \
+		hyprland \
+		hyprlock \
+		hypridle \
+		hyprpaper \
+		waybar \
+		swaync \
+		pipewire \
+		pipewire-pulse \
+		polkit-gnome \
+		xdg-desktop-portal-hyprland \
+		uwsm
+}
 
-	log_success "System packages installed successfully"
+installPackagesFedora() {
+    	sudo dnf update -y
+	sudo dnf copr enable solopasha/hyprland -y
+   	sudo dnf install -y \
+        	git ddcutil btop htop libnotify pavucontrol \
+        	wireplumber playerctl wofi swaybg \
+        	gnome-terminal evince xed nemo mpv curl \
+		hyprland \
+		hyprlock \
+		hypridle \
+		hyprpaper \
+		waybar \
+		SwayNotificationCenter \
+		pipewire \
+		pipewire-pulse \
+		polkit-gnome \
+		xdg-desktop-portal-hyprland \
+		uwsm
 }
 
 repoCopyToTarget() {
@@ -93,9 +166,9 @@ repoCopyToTarget() {
 
 	mkdir -p "$TARGET_DIR"
 
-	cp -r "$ORIGINAL_DIR"/* "$TARGET_DIR/"
+	cp -r "${ORIGINAL_DIR}"/* "${TARGET_DIR}/"
 
-	cp -r "$ORIGINAL_DIR"/.[^.]* "$TARGET_DIR/" 2>/dev/null || true
+	cp -r "${ORIGINAL_DIR}"/.[^.]* "${TARGET_DIR}/" 2>/dev/null || true
 
 	log_success "Dotfiles centralized. All future operations will use $TARGET_DIR"
 }
@@ -124,6 +197,25 @@ takePermissions() {
 	log_success "Permissions set for ~/.local/bin"
 }
 
+backupConfigs() {
+    	local backup_path="${BACKUP_CONFIG_LOCATION}/backup_$(date +%Y%m%d_%H%M%S)"
+   
+	mkdir -p "$backup_path"
+
+	log_info "Moving original ~/.config folders to backup folder"
+
+	[ -d "${HOME}/.config/hypr" ]   && mv "${HOME}/.config/hypr" 	 	"$backup_path"
+	[ -d "${HOME}/.config/waybar" ] && mv "${HOME}/.config/waybar" 		"$backup_path"
+	[ -d "${HOME}/.config/wofi" ]   && mv "${HOME}/.config/wofi" 	 	"$backup_path"
+	[ -d "${HOME}/.config/btop" ]   && mv "${HOME}/.config/btop" 	 	"$backup_path"
+	
+	# if [ "$IS_DEBIAN" == true ]; then 
+	[ -d "${HOME}/.config/swaync" ]   && mv "${TARGET_DIR}/config/swaync" 	"${backup_path}"
+	# fi
+
+	log_success "Moved the original ${HOME}/.config to ${backup_path}"
+}
+
 simlinkCreate() {
 	mkdir -p "${HOME}/.config"
 
@@ -134,8 +226,10 @@ simlinkCreate() {
 	ln -sfn "${TARGET_DIR}/config/waybar" 	"${HOME}/.config/"
 	ln -sfn "${TARGET_DIR}/config/wofi" 	"${HOME}/.config/"
 	ln -sfn "${TARGET_DIR}/config/btop" 	"${HOME}/.config/"
-	ln -sfn "${TARGET_DIR}/config/swaync" 	"${HOME}/.config/"
 
+	# if [ "$IS_DEBIAN" == true ] ; then
+	ln -sfn "${TARGET_DIR}/config/swaync" 	"${HOME}/.config/"
+	# fi
 
 	log_info "Scripts to ~/.local/bin:"
 
@@ -166,7 +260,7 @@ simlinkCreate() {
 
 bashAppend() {
 	if [ ! -f "${HOME}/.bashrc" ]; then
-		exit_with_error "~/.bashrc not found"
+		exit_with_error "${HOME}/.bashrc not found"
 	fi
 
 	if grep -q "# === hyprland config start ===" "${HOME}/.bashrc"; then
@@ -257,8 +351,11 @@ hyprshotInstall() {
       	echo """
 		Manual Hyprshot Installation:
 			1. git clone https://github.com/Gustash/hyprshot.git ~/Hyprshot
+
 			2. chmod +x ~/Hyprshot/hyprshot
+			
 			3. mkdir -p ~/.local/bin && ln -s ~/Hyprshot/hyprshot ~/.local/bin/hyprshot
+			
 			4. hyprshot --help 
 	"""
       	;;
@@ -288,7 +385,7 @@ walkInstall() {
 		if bash "${HOME}/walk/install.sh"; then
 			log_success "Walk installed successfully"
 		else
-		l	og_warning "Walk install script failed"
+			log_warning "Walk install script failed"
 		fi
 	else
 		log_warning "Failed to clone walk"
@@ -298,7 +395,9 @@ walkInstall() {
       	echo """
 		Manual Walk Installation:
 			1. git clone https://github.com/antonmedv/walk.git ~/walk
+
 			2. chmod +x ~/walk/install.sh
+			
 			3. bash ~/walk/install.sh
 	"""
 	;;
@@ -309,70 +408,29 @@ walkInstall() {
 
 }
 
-obsidianInstall() {
-	if command -v obsidian &>/dev/null; then
-		log_success "obsidian is already installed, skipping."
+yayInstall() {
+	if command -v yay &>/dev/null; then
+		log_success "yay already installed"
 		return
 	fi
-
-	echo "  [1] Auto install from GitHub"
-	echo "  [2] Manual install (show instructions)"
-	echo "  [3] Skip"
-	read -rp "Select option [1/2/3]: " obsidianChoice
 	
-	case "$obsidianChoice" in
-	1)
-		log_info "Installing latest version..."
-		
-		local version
-
-		version=$(curl -s https://api.github.com/repos/obsidianmd/obsidian-releases/releases/latest \
-			| grep '"tag_name"' | cut -d'"' -f4 | tr -d 'v')
-
-		local deb_url="https://github.com/obsidianmd/obsidian-releases/releases/download/v${version}/obsidian_${version}_amd64.deb"
-		
-		local deb_path="/tmp/obsidian_${version}.deb"
-
-		if curl -L "$deb_url" -o "$deb_path"; then
-			sudo apt install -y "$deb_path"
-			rm "$deb_path"
-			log_success "Obsidian ${version} installed"
-			log_info "Now you can add the obsidian dark theme to your vault"
-		else
-			log_warning "Failed to download Obsidian, install it manually from https://obsidian.md"
-		fi
-	;;
-	2)
-		echo """
-			Manual Obsidian Installation:
-				1. got to https://obsidian.md/download
-				2. download the appropriate package for you system
-				3. got to the download directory and run "sudo a install ./obsidian_*.deb"
-				4. install it with "sudo apt install ./path/to/obsidian_*.deb"
-				5. remove the .deb file after installation with "rm ./path/to/obsidian_*.deb"
-				6. Now you can add the obsidian dark theme to your "VaultName/.obsidian/themes/"
-		"""
-		
-	;;
-	3|*)
-		log_info "Obsidian installation skipped"
-	;;
-	esac
+	log_info "Installing yay (AUR helper)..."
+	sudo pacman -S --noconfirm git base-devel
+	git clone https://aur.archlinux.org/yay.git /tmp/yay
+	cd /tmp/yay && makepkg -si --noconfirm
+	cd - && rm -rf /tmp/yay
+	
+	log_success "yay installed"
 }
 
 zenInstall() {
+
 	if command -v zen &>/dev/null; then
 		log_success "Zen Browser is already installed, skipping."
 		return
 	fi
 
-	echo "  [1] Auto install from GitHub"
-	echo "  [2] Manual install (show instructions)"
-	echo "  [3] Skip"
-	read -rp "Select option [1/2/3]: " choice
-
-	case "$choice" in
-	1)
+	innerZenInstall(){
 		local tarball_url="https://github.com/zen-browser/desktop/releases/latest/download/zen.linux-x86_64.tar.xz"
 		local tarball_path="/tmp/zen.linux-x86_64.tar.xz"
 		local install_dir="${HOME}/zen-browser"
@@ -392,10 +450,36 @@ zenInstall() {
 		else
 			log_warning "Failed to download Zen Browser"
 		fi
+			
+	}
+	
+	echo "  [1] Auto install from GitHub"
+	echo "  [2] Manual install (show instructions)"
+	echo "  [3] Skip"
+	read -rp "Select option [1/2/3]: " choice
+	
+	case "$choice" in
+	1)	
+		if [ "$IS_DEBIAN" == true ] ; then
+			innerZenInstall
+		fi
+	
+		if [ "$IS_ARCH" == true ]; then
+   			if command -v yay &>/dev/null; then
+        			yay -S --noconfirm zen-browser-bin
+    			else
+        			log_warning "yay not found — falling back to tarball install"
+				innerZenInstall
+			fi
+    		fi
+
+		if [ "$IS_FEDORA" == true ] ; then
+			innerZenInstall
+		fi
+
 	;;
 	2)
 	echo """
-
 		Manual Zen Browser Installation:
 			1. Download:
 			"curl -L https://github.com/zen-browser/desktop/releases/latest/download/zen.linux-x86_64.tar.xz -o /tmp/zen.tar.xz"
@@ -415,6 +499,95 @@ zenInstall() {
 	esac
 }
 
+obsidianInstall() {
+	if command -v obsidian &>/dev/null; then
+		log_success "obsidian is already installed, skipping."
+		return
+	fi
+
+	echo "  [1] Auto install from GitHub"
+	echo "  [2] Manual install (show instructions)"
+	echo "  [3] Skip"
+	read -rp "Select option [1/2/3]: " obsidianChoice
+	
+	
+	case "$obsidianChoice" in
+	1)
+		local version
+		version=$(curl -s https://api.github.com/repos/obsidianmd/obsidian-releases/releases/latest \
+		| grep '"tag_name"' | cut -d'"' -f4 | tr -d 'v')
+		
+		if [ "$IS_DEBIAN" == true ]; then
+			log_info "Downloading obsidian"
+			local pkg_url="https://github.com/obsidianmd/obsidian-releases/releases/download/v${version}/obsidian_${version}_amd64.deb"
+			local pkg_path="/tmp/obsidian_${version}.deb"
+			curl -L "$pkg_url" -o "$pkg_path" 
+			sudo apt install -y "$pkg_path" 
+			rm "$pkg_path"
+		fi
+
+		if [ "$IS_ARCH" == true ]; then
+			if command -v yay &>/dev/null; then	
+				log_info "Downloading obsidian"
+				yay -S --noconfirm obsidian
+			else
+				log_warning "yay not found — install obsidian from AUR manually"
+			fi
+		fi
+
+		if [ "$IS_FEDORA" == true ]; then
+			log_info "Downloading obsidian"
+			local pkg_url="https://github.com/obsidianmd/obsidian-releases/releases/download/v${version}/obsidian-${version}-x86_64.rpm"
+			local pkg_path="/tmp/obsidian_${version}.rpm"
+			curl -L "$pkg_url" -o "$pkg_path"
+			sudo dnf install -y "$pkg_path" 
+			rm "$pkg_path"
+		fi
+
+		log_success "Obsidian ${version} installed"
+	;;
+	2)
+	echo """
+		Manual Obsidian Installation:
+			1. got to https://obsidian.md/download
+
+			2. download the appropriate package for you system
+			
+			3. got to the download directory and run "sudo apt install ./obsidian_*.deb"
+			
+			4. install it with "sudo apt install ./path/to/obsidian_*.deb"
+			
+			5. remove the .deb file after installation with "rm ./path/to/obsidian_*.deb"
+			
+			6. Now you can add the obsidian dark theme to your "VaultName/.obsidian/themes/"
+	"""
+	;;
+	3|*)
+		log_info "Obsidian installation skipped"
+	;;
+	esac
+}
+
+vscodeThemeInstall(){		
+	local settings="${HOME}/.config/Code/User/settings.json"
+
+	if command -v code &>/dev/null; then
+		log_info "Now installing vscode theme"
+		
+		mkdir -p "${HOME}/.vscode/extensions"
+
+		code --install-extension 'viktorqvarfordt.vscode-pitch-black-theme' 2>/dev/null && log_success "VSCode Pitch Black theme installed" || log_warning "Failed to install VSCode Pitch Black theme"	
+
+		mkdir -p "$(dirname "$settings")"
+
+		if [ -f "$settings" ]; then
+			sed -i 's/"workbench.colorTheme": ".*"/"workbench.colorTheme": "Pitch Black"/' "$settings"
+		else
+			echo '{ "workbench.colorTheme": "Pitch Black" }' > "$settings"
+		fi		
+	fi
+}
+
 vscodeInstall() {
 	if command -v code &>/dev/null; then
 		log_success "vscode is already installed, skipping."
@@ -428,35 +601,36 @@ vscodeInstall() {
 
 	case "$vscodeChoice" in
 	1)
-		log_info "Fetching latest VSCode release..."
+		if [ "$IS_DEBIAN" == true ]; then
+			log_info "Downloading Vscode"
+			local pkg_url="https://code.visualstudio.com/sha/download?build=stable&os=linux-deb-x64"
+			local pkg_path="/tmp/vscode.deb"
+			curl -L "$pkg_url" -o "$pkg_path" 
+			sudo apt install -y "$pkg_path" 
+			rm "$pkg_path"
+			vscodeThemeInstall
+		fi
 
-		local version
-		version=$(curl -s https://api.github.com/repos/microsoft/vscode/releases/latest \
-		| grep '"tag_name"' | cut -d'"' -f4)
+		if [ "$IS_ARCH" == true ]; then
+			if command -v yay &>/dev/null; then
+				log_info "Downloading Vscode"
+				yay -S --noconfirm visual-studio-code-bin
+			else
+				log_warning "yay not found — install VSCode from AUR manually"
+			fi
+		fi
 
-		local deb_url="https://github.com/microsoft/vscode/releases/download/${version}/code_${version}_amd64.deb"
-		local deb_path="/tmp/vscode_${version}.deb"
-
-		log_info "Downloading VSCode ${version}..."
-		if curl -L "$deb_url" -o "$deb_path"; then
-			sudo apt install -y "$deb_path"
-			rm "$deb_path"
-			log_success "VSCode ${version} installed"
-			
-			if command -v code &>/dev/null; then
-				log_info "Now installing vscode theme"
-				mkdir -p "${HOME}/.vscode/extensions"
-				code --install-extension 'viktorqvarfordt.vscode-pitch-black-theme' 2>/dev/null && log_success "VSCode Pitch Black theme installed" || log_warning "Failed to install VSCode Pitch Black theme"	
-				
-				sed -i 's/"workbench.colorTheme": ".*"/"workbench.colorTheme": "Pitch Black"/' ~/.config/Code/User/settings.json
-			fi	
-		else
-			log_warning "Failed to download VSCode"
+		if [ "$IS_FEDORA" == true ]; then
+			log_info "Downloading Vscode"
+			local pkg_url="https://code.visualstudio.com/sha/download?build=stable&os=linux-rpm-x64"
+			local pkg_path="/tmp/vscode.rpm"
+			curl -L "$pkg_url" -o "$pkg_path" 
+			sudo dnf install -y "$pkg_path" 
+			rm "$pkg_path"
 		fi
 	;;
 	2)
 	echo """
-
 		Manual VSCode Installation:
 			1. Go to https://code.visualstudio.com/Download
 			2. Download the .deb package (x64)
@@ -467,7 +641,6 @@ vscodeInstall() {
 			1. curl -L "https://code.visualstudio.com/sha/download?build=stable&os=linux-deb-x64" -o /tmp/vscode.deb
 			2. sudo apt install -y /tmp/vscode.deb
 			3. code --version
-
 	"""
 	;;
 	3|*)
@@ -476,37 +649,113 @@ vscodeInstall() {
 	esac
 }
 
-main() {
-	log_section "LinuxMintHyprlandConfig Installation"
+optionalInstallAll() {	
+	log_section "Hyprshot Installation (Optional)"
+	hyprshotInstall
 
-	echo "This script will:"
-	echo "  • Relocate suite to ~/.local/share/LinuxMintHyprlandConfig"
-	echo "  • Install system packages (requires sudo)"
-	echo "  • Create symlinks in ~/.local/bin (user-local, no sudo)"
-	echo "  • Create symlinks in ~/.config (user-local, no sudo)"
-	echo "  • Append to .bashrc with safe environment variables"
-	echo "  • Apply GTK theme with gesttings"
-	echo ""
+	log_section "Walk Installation (Optional)"
+	walkInstall
+	
+	log_section "Zen Browser Installation (Optional)"
+	zenInstall
+	
+	log_section "Obsidian Installation (Optional)"
+	obsidianInstall
 
-	read -p "Continue with installation? (y/n) [n]: " -r continue_install
-	continue_install=${continue_install:-n}
+	log_section "VSCode Installation (Optional)"
+	vscodeInstall
+}
 
-	if [[ ! $continue_install =~ ^[Yy]$ ]]; then
-		log_warning "Installation cancelled"
-		exit 0
-	fi
-
-  	log_section "Pre-Installation Checks"
+debianInstall(){
+	log_section "Pre-Installation Checks"
 	checkIfDebian
 	
+	log_section "${PROJECT_NAME} Installation"
+	installProceed
+
 	log_section "System Package Installation"
-	installPackage
+	installPackagesDebian
 
 	log_section "Relocating Dotfiles Suite"
 	repoCopyToTarget
 
 	log_section "Permissions & Configuration"
 	takePermissions
+
+	log_section "Backing up original configs"
+	backupConfigs
+	
+	log_section "Creating Symlinks"
+	simlinkCreate
+
+	log_section "configuring .bashrc"
+	bashAppend
+
+	log_section "Applying GTK Theme"
+	themeApply
+
+	if  [ "$SKIP_OPTIONAL_INSTALLS" == true ]; then
+		log_info "Optional app installations will be skipped"
+	else
+		log_section "Optional Installations"
+		optionalInstallAll
+	fi	
+}
+
+archInstall(){
+  	log_section "Pre-Installation Checks"
+	checkIfArch
+	
+	log_section "${PROJECT_NAME} Installation"
+	installProceed
+
+	log_section "System Package Installation"
+	installPackagesArch
+
+	log_section "Relocating Dotfiles Suite"
+	repoCopyToTarget
+
+	log_section "Permissions & Configuration"
+	takePermissions
+
+	log_section "Backing up original configs"
+	backupConfigs
+	
+	log_section "Creating Symlinks"
+	simlinkCreate
+
+	log_section "configuring .bashrc"
+	bashAppend
+
+	log_section "Applying GTK Theme"
+	themeApply
+
+	if [ "$SKIP_OPTIONAL_INSTALLS" == true ] ; then
+		log_info "Optional app installations will be skipped"
+	else
+		log_section "Optional Installations"
+		optionalInstallAll
+	fi	
+}
+
+fedoraInstall(){
+  	log_section "Pre-Installation Checks"
+	checkIfFedora
+		
+	log_section "${PROJECT_NAME} Installation"
+	installProceed
+
+	log_section "System Package Installation"
+	installPackagesFedora
+
+	log_section "Relocating Dotfiles Suite"
+	repoCopyToTarget
+
+	log_section "Permissions & Configuration"
+	takePermissions
+
+	log_section "Backing up original configs"
+	backupConfigs
 
 	log_section "Creating Symlinks"
 	simlinkCreate
@@ -517,21 +766,181 @@ main() {
 	log_section "Applying GTK Theme"
 	themeApply
 
-	log_section "Hyprshot Installation (Optional)"
-	hyprshotInstall
+	if [ "$SKIP_OPTIONAL_INSTALLS" == true ] ; then
+		log_info "Optional app installations will be skipped"
+	else
+		log_section "Optional Installations"
+		optionalInstallAll
+	fi
+}
 
-	log_section "Walk Installation (Optional)"
-	walkInstall
+restoreConfigs() {
+	log_section "Restoring Original Configs"
 
-	log_section "Obsidian Installation (Optional)"
-	obsidianInstall
+	local latest_backup
+	latest_backup=$(ls -td "${BACKUP_CONFIG_LOCATION}"/backup_* 2>/dev/null | head -1)
 
-	log_section "Zen Browser Installation (Optional)"
-	zenInstall
+	if [ -z "$latest_backup" ]; then
+		log_error "No backup found in ${BACKUP_CONFIG_LOCATION}"
+		exit 1
+	fi
+
+	log_info "Restoring from: $latest_backup"
+
+	log_info "Removing symlinks..."
 	
-	log_section "VSCode Installation (Optional)"
-	vscodeInstall
+	rm -f "${HOME}/.config/hypr"
+	rm -f "${HOME}/.config/waybar"
+	rm -f "${HOME}/.config/wofi"
+	rm -f "${HOME}/.config/btop"
+	rm -f "${HOME}/.config/swaync"
+	
+	rm -f "${HOME}/.themes/Graphite-Dark"
+	
+	rm -f "${HOME}/.local/bin/custombrightnessctl"
+	rm -f "${HOME}/.local/bin/custombtoplauncher"
+	rm -f "${HOME}/.local/bin/customlinkopenr"
+	rm -f "${HOME}/.local/bin/customhyprlandexit"
+	rm -f "${HOME}/.local/bin/customwofisearch"
 
+	log_info "Restoring config folders..."
+
+	for folder in "$latest_backup"/*/; do
+		local name
+		name=$(basename "$folder")
+		if [ -e "${HOME}/.config/$name" ]; then
+			log_warning "${HOME}/.config/$name already exists, skipping"
+		else
+			mv "$folder" "${HOME}/.config/$name"
+			log_success "Restored: ~/.config/$name"
+		fi
+	done
+
+	log_warning "Installed packages and apps were NOT removed."
+	echo ""
+	echo "  To remove packages manually:"
+	echo ""
+
+	if   [ "$IS_DEBIAN" == true ]; then
+		echo "  sudo apt remove waybar wofi swaybg swaync playerctl btop ddcutil"
+	elif [ "$IS_ARCH" == true ]; then
+		echo "  sudo pacman -Rns waybar wofi swaybg playerctl btop ddcutil hyprland"
+	elif [ "$IS_FEDORA" == true ]; then
+		echo "  sudo dnf remove waybar wofi swaybg playerctl btop ddcutil hyprland"
+	else
+		echo "  Remove packages using your distro's package manager"
+	fi
+
+	echo ""
+	log_info "You can now delete the repo folder:"
+	echo "  rm -rf ${TARGET_DIR}"
+	echo "  rm -rf ${ORIGINAL_DIR}"
+
+	log_success "Restore complete"
+}
+
+updateProject() {
+	log_section "Updating ${PROJECT_NAME}"
+
+	if [ ! -d "${TARGET_DIR}/.git" ]; then
+		log_error "Target directory is not a git repo, cannot update"
+		echo "Either move to the home ${PROJECT_NAME} folder and then re-run"
+		echo "or"
+		echo "Move to ${TARGET_DIR} folder and then re-run"
+		exit 1
+	fi
+
+	cd "$TARGET_DIR"
+	git pull
+	cd - >/dev/null
+
+	simlinkCreate
+
+	log_success "Update complete — re-login to apply any config changes"
+}
+
+installProceed(){
+	echo "This script will:"
+	echo "	• Check what distrobution you installing this onto"
+	echo "  • Relocate suite to ~/.local/share/${PROJECT_NAME}"
+	echo "  • Install system packages (requires sudo)"
+	echo "  • Create symlinks in ~/.local/bin (user-local, no sudo)"
+	echo "	• Moves the original Config folders to 'backupFolder' (folder from previous setup)"
+	echo "  • Create symlinks in ~/.config (user-local, no sudo)"
+	echo "  • Append to .bashrc with safe environment variables"
+	echo "  • Apply GTK theme with gesttings based on your desktop enviourment"
+	echo ""
+
+	
+	read -p "Continue with installation? (y/n) [n]: " -r continue_install
+	continue_install=${continue_install:-n}
+
+	if [[ ! $continue_install =~ ^[Yy]$ ]]; then
+		log_warning "Installation cancelled"
+		exit 0
+	fi
+}
+
+main(){
+	if [ -z "$1" ]; then
+		echo "Error: first argument cannot be empty."
+		echo "Usage: $0 [--help] [--debian | --arch | --fedora] [--no-optional]"
+		exit 1
+	fi
+
+	# if [ "${2:-}" == "--no-optional" ] || [ "${2:-}" == "-n" ]; then
+	# 	SKIP_OPTIONAL_INSTALLS=true
+	# fi
+
+	while [[ $# -gt 0 ]]; do
+	case "$1" in
+		-h|--help)
+			echo "Usage: $0 [--debian] | [--arch] | [--fedora] [--no-optional] [--help]"
+			echo ""
+			echo "  --debian   	-b	Install packages for Debian-based systems (apt)"
+			echo "  --arch     	-a	Install packages for Arch-based systems (pacman)"
+			echo "  --fedora   	-f	Install packages for Fedora-based systems (dnf)"
+			echo "  --no-optional   -n	Used after 'distro tag' to Skip optional apps installations"
+			echo "  --restore       -r    	Remove symlinks and restore original configs"
+			echo "  --update        -u 	Updates the project but no backup rn"
+			echo "  --help          -h	Show this help message and exit"
+			echo ""
+			exit 0
+		;;
+		-d|--debian)
+			IS_DEBIAN=true
+			debianInstall
+			shift
+		;;
+		-a|--arch)
+			IS_ARCH=true
+			archInstall
+			shift
+		;;
+		-f|--fedora)
+			IS_FEDORA=true
+			fedoraInstall
+			shift
+		;;
+		-n|--no-optional)
+		        SKIP_OPTIONAL_INSTALLS=true
+			shift
+		;;	
+		-u|--update)
+			updateProject
+			shift
+		;;
+		-r|--restore)
+			restoreConfigs
+			shift
+		;;
+		-*|*)
+			echo "Error: Unknown option $1" >&2
+			exit 1
+		;;
+		esac
+	done
+	
 	log_section " Install Done."
 
 	log_success "Installation completed successfully!"
