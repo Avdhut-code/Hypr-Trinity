@@ -94,7 +94,7 @@ The setup menu will guide you through the process:
 
 ---
 # Installation
-<b>:recommended</b> to install after your in a hyprland session or after you install hyprland 
+<b>recommended</b> to install after your in a hyprland session or after you install hyprland 
 ## Quick Start
 
 ```bash
