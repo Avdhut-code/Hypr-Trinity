@@ -10,7 +10,7 @@ NC='\033[0m'
 
 ORIGINAL_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-### CHANGE IT 
+### CHANGE IT ###
 ### CHNAGE THIS AS WELL AS CHANGE IN THE WHOLE REPO TO AVOID THE TYPO ERROR OF 'file not found'
 PROJECT_NAME="LinuxMintHyprlandConfig"
 
@@ -18,10 +18,14 @@ TARGET_DIR="${HOME}/.local/share/${PROJECT_NAME}"
 BACKUP_CONFIG_LOCATION="${TARGET_DIR}/backupConfigs"
 
 SKIP_OPTIONAL_INSTALLS=false
+SYMLINK_INSTALL_TOOL=false
 
 IS_DEBIAN=false
 IS_ARCH=false
 IS_FEDORA=false
+
+IS_INSTALL=false
+IS_UPDATE=false
 
 log_info() {
   	echo -e "${BLUE}[INFO]${NC} $*"
@@ -60,6 +64,11 @@ checkIfDebian() {
 	if ! grep -q "^ID=.*debian\|^ID=linuxmint" /etc/os-release 2>/dev/null; then
 		exit_with_error "This script only supports Debian-based systems (Linux Mint, Ubuntu, etc.)"
 	fi
+	
+	if ! grep -q "DOTFILE_SYSTEM=" "${HOME}/.bashrc"; then
+		echo 'export DOTFILE_SYSTEM="debian"' >> "${HOME}/.bashrc"
+		log_success "DOTFILE_SYSTEM=debian written to .bashrc"
+	fi
 
 	log_success "System is Debian-based"
 }
@@ -74,6 +83,11 @@ checkIfArch() {
 	if ! grep -q "^ID=.*arch\|^ID=manjaro" /etc/os-release 2>/dev/null; then
 		exit_with_error "This script only supports Arch-based systems (Arch Linux, Manjaro, etc.)"
 	fi
+	
+	if ! grep -q "DOTFILE_SYSTEM=" "${HOME}/.bashrc"; then
+		echo 'export DOTFILE_SYSTEM="arch"' >> "${HOME}/.bashrc"
+		log_success "DOTFILE_SYSTEM=arch written to .bashrc"
+	fi
 
 	log_success "System is Arch-based"
 }
@@ -87,6 +101,11 @@ checkIfFedora() {
 
 	if ! grep -q "^ID=.*fedora" /etc/os-release 2>/dev/null; then
 		exit_with_error "This script only supports Fedora-based systems"
+	fi
+	
+	if ! grep -q "DOTFILE_SYSTEM=" "${HOME}/.bashrc"; then
+		echo 'export DOTFILE_SYSTEM="fedora"' >> "${HOME}/.bashrc"
+		log_success "DOTFILE_SYSTEM=fedora written to .bashrc"
 	fi
 
 	log_success "System is Fedora-based"
@@ -198,7 +217,14 @@ takePermissions() {
 }
 
 backupConfigs() {
-    	local backup_path="${BACKUP_CONFIG_LOCATION}/backup_$(date +%Y%m%d_%H%M%S)"
+	if [ "${IS_UPDATE}" == true ] ; then 
+        	log_info "Update mode — skipping backup"
+        	return		
+	fi
+
+    	local backup_path
+
+    	backup_path="${BACKUP_CONFIG_LOCATION}/backup_$(date +%Y%m%d_%H%M%S)"
    
 	mkdir -p "$backup_path"
 
@@ -210,7 +236,7 @@ backupConfigs() {
 	[ -d "${HOME}/.config/btop" ]   && mv "${HOME}/.config/btop" 	 	"$backup_path"
 	
 	# if [ "$IS_DEBIAN" == true ]; then 
-	[ -d "${HOME}/.config/swaync" ]   && mv "${TARGET_DIR}/config/swaync" 	"${backup_path}"
+	[ -d "${HOME}/.config/swaync" ]   && mv "${HOME}/.config/swaync" 	"${backup_path}"
 	# fi
 
 	log_success "Moved the original ${HOME}/.config to ${backup_path}"
@@ -218,8 +244,6 @@ backupConfigs() {
 
 simlinkCreate() {
 	mkdir -p "${HOME}/.config"
-
-	rmdir -rf "${HOME}/.config/hypr" 2>/dev/null || true
 
 	log_info "Config directories:"
 	ln -sfn "${TARGET_DIR}/config/hypr" 	"${HOME}/.config/"
@@ -265,7 +289,7 @@ bashAppend() {
 
 	if grep -q "# === hyprland config start ===" "${HOME}/.bashrc"; then
 		log_info "hyprland configuration already in .bashrc (skipping)"
-	return
+		return
 	fi
 
 	if [ -f "$ORIGINAL_DIR/bashAppend.sh" ]; then
@@ -460,7 +484,7 @@ zenInstall() {
 	
 	case "$choice" in
 	1)	
-		if [ "$IS_DEBIAN" == true ] ; then
+		if [ "$IS_DEBIAN" == true ]; then
 			innerZenInstall
 		fi
 	
@@ -473,7 +497,7 @@ zenInstall() {
 			fi
     		fi
 
-		if [ "$IS_FEDORA" == true ] ; then
+		if [ "$IS_FEDORA" == true ]; then
 			innerZenInstall
 		fi
 
@@ -669,9 +693,6 @@ optionalInstallAll() {
 debianInstall(){
 	log_section "Pre-Installation Checks"
 	checkIfDebian
-	
-	log_section "${PROJECT_NAME} Installation"
-	installProceed
 
 	log_section "System Package Installation"
 	installPackagesDebian
@@ -706,9 +727,6 @@ archInstall(){
   	log_section "Pre-Installation Checks"
 	checkIfArch
 	
-	log_section "${PROJECT_NAME} Installation"
-	installProceed
-
 	log_section "System Package Installation"
 	installPackagesArch
 
@@ -730,7 +748,7 @@ archInstall(){
 	log_section "Applying GTK Theme"
 	themeApply
 
-	if [ "$SKIP_OPTIONAL_INSTALLS" == true ] ; then
+	if  [ "$SKIP_OPTIONAL_INSTALLS" == true ]; then
 		log_info "Optional app installations will be skipped"
 	else
 		log_section "Optional Installations"
@@ -742,9 +760,6 @@ fedoraInstall(){
   	log_section "Pre-Installation Checks"
 	checkIfFedora
 		
-	log_section "${PROJECT_NAME} Installation"
-	installProceed
-
 	log_section "System Package Installation"
 	installPackagesFedora
 
@@ -766,7 +781,7 @@ fedoraInstall(){
 	log_section "Applying GTK Theme"
 	themeApply
 
-	if [ "$SKIP_OPTIONAL_INSTALLS" == true ] ; then
+	if  [ "$SKIP_OPTIONAL_INSTALLS" == true ]; then
 		log_info "Optional app installations will be skipped"
 	else
 		log_section "Optional Installations"
@@ -844,17 +859,51 @@ updateProject() {
 
 	if [ ! -d "${TARGET_DIR}/.git" ]; then
 		log_error "Target directory is not a git repo, cannot update"
-		echo "Either move to the home ${PROJECT_NAME} folder and then re-run"
-		echo "or"
-		echo "Move to ${TARGET_DIR} folder and then re-run"
+		log_info "Re-clone the repo to ${TARGET_DIR} and re-run install first"
 		exit 1
 	fi
 
+	local system="${DOTFILE_SYSTEM:-}"
+
+	if [ -z "$system" ]; then
+		log_error "DOTFILE_SYSTEM not set in environment"
+		log_info "Run: source ~/.bashrc  then try again"
+		log_info "Or re-run install.sh with your distro flag to set it"
+		exit 1
+	fi
+
+	log_info "Detected install distro: $system"
+
+	# pull latest changes
+	log_info "Pulling latest changes..."
 	cd "$TARGET_DIR"
 	git pull
 	cd - >/dev/null
 
-	simlinkCreate
+	case "$system" in
+		debian)
+			IS_DEBIAN=true	
+			IS_UPDATE=true
+			SKIP_OPTIONAL_INSTALLS=true  			
+			debianInstall
+		;;
+		arch)
+			IS_ARCH=true
+			IS_UPDATE=true
+			SKIP_OPTIONAL_INSTALLS=true
+			archInstall
+		;;
+		fedora)
+			IS_FEDORA=true
+			IS_UPDATE=true
+			SKIP_OPTIONAL_INSTALLS=true
+			fedoraInstall
+		;;
+		*)
+			log_error "Unknown DOTFILE_SYSTEM value: $system"
+			exit 1
+		;;
+	esac
 
 	log_success "Update complete — re-login to apply any config changes"
 }
@@ -862,15 +911,16 @@ updateProject() {
 installProceed(){
 	echo "This script will:"
 	echo "	• Check what distrobution you installing this onto"
-	echo "  • Relocate suite to ~/.local/share/${PROJECT_NAME}"
 	echo "  • Install system packages (requires sudo)"
+	echo "  • Relocate suite to ~/.local/share/${PROJECT_NAME}"
 	echo "  • Create symlinks in ~/.local/bin (user-local, no sudo)"
 	echo "	• Moves the original Config folders to 'backupFolder' (folder from previous setup)"
 	echo "  • Create symlinks in ~/.config (user-local, no sudo)"
 	echo "  • Append to .bashrc with safe environment variables"
 	echo "  • Apply GTK theme with gesttings based on your desktop enviourment"
+	echo "  • Ask you to permission to install based on your desktop enviourment"
+	echo "    - [ If you used the '--no-optional' tag, will skip over the permission ]"
 	echo ""
-
 	
 	read -p "Continue with installation? (y/n) [n]: " -r continue_install
 	continue_install=${continue_install:-n}
@@ -878,6 +928,23 @@ installProceed(){
 	if [[ ! $continue_install =~ ^[Yy]$ ]]; then
 		log_warning "Installation cancelled"
 		exit 0
+	fi
+}
+
+updateToolSimlink(){
+	if [ ! -f "${TARGET_DIR}/install.sh" ]; then
+		log_error "${TARGET_DIR}/install.sh not found"
+		exit 1
+	fi
+
+	if [ "${SYMLINK_INSTALL_TOOL:-false}" == true ]; then
+		log_info "Simlinking the install.sh tool"
+	    	
+		ln -sfn "${TARGET_DIR}/install.sh" "${HOME}/.local/bin/updateproject"
+	   	
+		chmod +x "${TARGET_DIR}/install.sh"
+		
+		log_success "updateproject symlinked to ~/.local/bin"
 	fi
 }
 
@@ -897,7 +964,7 @@ main(){
 		-h|--help)
 			echo "Usage: $0 [--debian] | [--arch] | [--fedora] [--no-optional] [--help]"
 			echo ""
-			echo "  --debian   	-b	Install packages for Debian-based systems (apt)"
+			echo "  --debian   	-d	Install packages for Debian-based systems (apt)"
 			echo "  --arch     	-a	Install packages for Arch-based systems (pacman)"
 			echo "  --fedora   	-f	Install packages for Fedora-based systems (dnf)"
 			echo "  --no-optional   -n	Used after 'distro tag' to Skip optional apps installations"
@@ -909,16 +976,22 @@ main(){
 		;;
 		-d|--debian)
 			IS_DEBIAN=true
+			IS_INSTALL=true
+			installProceed
 			debianInstall
 			shift
 		;;
 		-a|--arch)
 			IS_ARCH=true
+			IS_INSTALL=true
+			installProceed
 			archInstall
 			shift
 		;;
 		-f|--fedora)
 			IS_FEDORA=true
+			IS_INSTALL=true
+			installProceed
 			fedoraInstall
 			shift
 		;;
@@ -941,8 +1014,18 @@ main(){
 		esac
 	done
 	
-	log_section " Install Done."
+	if [ "${IS_INSTALL}" == true ]; then
+		log_section " Install Done."
 
+		read -rp "Symlink install.sh as 'updateproject' command for easy future updates? (y/n) [y]: " link_tool
+
+		link_tool=${link_tool:-y}
+
+		if [[ $link_tool =~ ^[Yy]$ ]]; then
+			SYMLINK_INSTALL_TOOL=true
+			updateToolSimlink
+		fi
+	fi	
 	log_success "Installation completed successfully!"
 }
 
