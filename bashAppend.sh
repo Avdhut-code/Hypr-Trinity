@@ -3,17 +3,17 @@
 export PATH="$HOME/.local/bin:$PATH"
 
 # Point to the permanent dotfiles suite location
-export TARGET_DIR="$HOME/.local/share/LinuxMintHyprlandConfig/"
-
-# env's for walk configuration/customization
-export EDITOR=vim
-export WALK_MAIN_COLOR="#5a5b5e"
-export WALK_STATUS_BAR='[Mode(), Owner(), Size() | PadLeft(7), ModTime() | PadLeft(12)] | join(" ")'
+export TARGET_DIR="$HOME/.local/share/LinuxMintHyprlandConfig"
 
 # short hand function
 function lk {
   cd "$(walk "$@")"
 }
+
+# env's for walk configuration/customization
+export EDITOR=vim
+export WALK_MAIN_COLOR="#5a5b5e"
+export WALK_STATUS_BAR='[Mode(), Owner(), Size() | PadLeft(7), ModTime() | PadLeft(12)] | join(" ")'
 
 # System tools environment variables
 export CURRENT_WALLPAPER="${TARGET_DIR}/wallpaper/wall1.png"
