@@ -8,16 +8,21 @@ YELLOW='\033[1;33m'
 BLUE='\033[1;34m'
 NC='\033[0m'
 
+### THERE IS SOME ISSUE WITH THIS 
 ORIGINAL_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 ### CHANGE IT ###
 ### CHNAGE THIS AS WELL AS CHANGE IN THE WHOLE REPO TO AVOID THE TYPO ERROR OF 'file not found'
 PROJECT_NAME="LinuxMintHyprlandConfig"
+VERSION="0.0.1"
 
 TARGET_DIR="${HOME}/.local/share/${PROJECT_NAME}"
 BACKUP_CONFIG_LOCATION="${TARGET_DIR}/backupConfigs"
 
 SKIP_OPTIONAL_INSTALLS=false
+AUTOMATIC_INSTALL_OPTIONAL=false
+
+
 SYMLINK_INSTALL_TOOL=false
 
 IS_DEBIAN=false
@@ -170,9 +175,10 @@ installPackagesFedora() {
 		SwayNotificationCenter \
 		pipewire \
 		pipewire-pulse \
-		polkit-gnome \
 		xdg-desktop-portal-hyprland \
 		uwsm
+
+	sudo dnf clean all 
 }
 
 repoCopyToTarget() {
@@ -194,6 +200,10 @@ repoCopyToTarget() {
 
 takePermissions() {
 	log_info "Adding user to i2c group for DDC-CI brightness control..."
+	
+	log_info "Creating i2c group..."
+
+	sudo groupadd i2c
 
 	if ! groups | grep -q i2c; then
 		sudo usermod -aG i2c "$(whoami)"
@@ -264,6 +274,7 @@ simlinkCreate() {
 	ln -sfn "${TARGET_DIR}/bin/customlinkopenr.sh"   	"${HOME}/.local/bin/customlinkopenr"
 	ln -sfn "${TARGET_DIR}/bin/customhyprlandexit.sh"       "${HOME}/.local/bin/customhyprlandexit"
 	ln -sfn "${TARGET_DIR}/bin/customwofisearch.sh"         "${HOME}/.local/bin/customwofisearch"
+	ln -sfn "${TARGET_DIR}/bin/customwallpaperswitcher.sh"         "${HOME}/.local/bin/customwallpaperswitcher"
 
 	log_info "Setting script permissions..."
 	
@@ -272,6 +283,7 @@ simlinkCreate() {
 	chmod +x "${TARGET_DIR}/bin/customlinkopenr.sh"   	
 	chmod +x "${TARGET_DIR}/bin/custombtoplauncher.sh" 	
 	chmod +x "${TARGET_DIR}/bin/custombrightnessctl.sh"      
+	chmod +x "${TARGET_DIR}/bin/customwallpaperswitcher.sh"      
 
 	log_info "GTK theme:"
 
@@ -282,7 +294,10 @@ simlinkCreate() {
 	log_success "Created symlink(s)"
 }
 
+### FIXING NEED INSUDE comment for collapsed function 
 bashAppend() {
+	### SOME BASH ERROR OF AT FROM /ETC/BASHRC LIKE SOME VAR MISSING
+	### ALSO ADD MORE ROBEST CHECK FOR NOT REPEATING APPEND
 	if [ ! -f "${HOME}/.bashrc" ]; then
 		exit_with_error "${HOME}/.bashrc not found"
 	fi
@@ -343,6 +358,18 @@ themeApply() {
 	esac
 }
 
+innerHyprshotinstall(){
+	log_info "Cloning Hyprshot..."
+	if git clone https://github.com/Gustash/hyprshot.git "${HOME}/Hyprshot" 2>/dev/null; then
+		chmod +x "${HOME}/Hyprshot/hyprshot"
+		mkdir -p "${HOME}/.local/bin"
+		ln -sfn "${HOME}/Hyprshot/hyprshot" "${HOME}/.local/bin/hyprshot"
+		log_success "Hyprshot installed at: ${HOME}/Hyprshot"
+	else
+		log_warning "Failed to clone Hyprshot"
+	fi
+}
+
 hyprshotInstall() {
 	if [ ! -t 0 ]; then
 		log_info "Non-interactive shell detected, skipping."
@@ -354,6 +381,11 @@ hyprshotInstall() {
 		return
 	fi
 
+	if [ "${AUTOMATIC_INSTALL_OPTIONAL}" == true ] ; then
+		innerHyprshotInstall
+		return
+	fi
+
 	echo "  [1] Auto install from GitHub"
 	echo "  [2] Manual install (show instructions)"
 	echo "  [3] Skip"
@@ -361,15 +393,7 @@ hyprshotInstall() {
 
 	case "$choice" in
 	1)
-	log_info "Cloning Hyprshot..."
-	if git clone https://github.com/Gustash/hyprshot.git "${HOME}/Hyprshot" 2>/dev/null; then
-		chmod +x "${HOME}/Hyprshot/hyprshot"
-		mkdir -p "${HOME}/.local/bin"
-		ln -sfn "${HOME}/Hyprshot/hyprshot" "${HOME}/.local/bin/hyprshot"
-		log_success "Hyprshot installed at: ${HOME}/Hyprshot"
-	else
-		log_warning "Failed to clone Hyprshot"
-	fi
+		innerHyprshotInstall		
 	;;
 	2)
       	echo """
@@ -389,21 +413,7 @@ hyprshotInstall() {
   	esac
 }
 
-walkInstall() {
-	if command -v walk &>/dev/null; then
-		log_success "Walk is already installed, skipping."
-		return
-	fi
-
-	log_info "Cloning walk..."
-
-	echo "  [1] Auto install from GitHub"
-	echo "  [2] Manual install (show instructions)"
-	echo "  [3] Skip"
-	read -rp "Select option [1/2/3]: " walkChoice
-	
-	case "$walkChoice" in
-	1)
+innerWalkInstall(){
 	if git clone https://github.com/antonmedv/walk.git "${HOME}/walk" 2>/dev/null; then
 		log_info "Running walk install script..."
 		if bash "${HOME}/walk/install.sh"; then
@@ -414,6 +424,27 @@ walkInstall() {
 	else
 		log_warning "Failed to clone walk"
 	fi
+}
+
+walkInstall() {
+	if command -v walk &>/dev/null; then
+		log_success "Walk is already installed, skipping."
+		return
+	fi
+
+	if [ "${AUTOMATIC_INSTALL_OPTIONAL}" == true ] ; then
+		innerWalkInstall
+		return
+	fi
+
+	echo "  [1] Auto install from GitHub"
+	echo "  [2] Manual install (show instructions)"
+	echo "  [3] Skip"
+	read -rp "Select option [1/2/3]: " walkChoice
+	
+	case "$walkChoice" in
+	1)
+		innerWalkInstall
 	;;
 	2)
       	echo """
@@ -447,6 +478,27 @@ yayInstall() {
 	log_success "yay installed"
 }
 
+innerZenInstall(){
+	local tarball_url="https://github.com/zen-browser/desktop/releases/latest/download/zen.linux-x86_64.tar.xz"
+	local tarball_path="/tmp/zen.linux-x86_64.tar.xz"
+	local install_dir="${HOME}/zen-browser"
+	log_info "Downloading Zen Browser..."
+	if curl -L "$tarball_url" -o "$tarball_path"; then
+
+		log_info "Extracting..."
+		mkdir -p "$install_dir"
+		tar -xf "$tarball_path" -C "$install_dir" --strip-components=1
+		log_info "Creating symlink..."
+		ln -sfn "$install_dir/zen" "${HOME}/.local/bin/zen"
+		rm "$tarball_path"
+		log_success "Zen Browser installed at: $install_dir"
+		
+		else
+			log_warning "Failed to download Zen Browser"
+		fi			
+}
+	
+### FIXING NEED INSUDE comment for collapsed function
 zenInstall() {
 
 	if command -v zen &>/dev/null; then
@@ -454,29 +506,8 @@ zenInstall() {
 		return
 	fi
 
-	innerZenInstall(){
-		local tarball_url="https://github.com/zen-browser/desktop/releases/latest/download/zen.linux-x86_64.tar.xz"
-		local tarball_path="/tmp/zen.linux-x86_64.tar.xz"
-		local install_dir="${HOME}/zen-browser"
+	## ADD AUTOMAIC_INSTALL SECTION ADD WITH HELP OF CASE like hyprshot,walk BUT IT HAS TO BE MOULAR OR NESTED FOR CHECKING DISTRO,AUTOMATIC FLAG AND THEN INVOKE THE INNERZEN FUNCTION AS ALL AS NEED TO BE ASKED BEFORE THIS SELCTION OPTION 
 
-		log_info "Downloading Zen Browser..."
-		if curl -L "$tarball_url" -o "$tarball_path"; then
-
-			log_info "Extracting..."
-			mkdir -p "$install_dir"
-			tar -xf "$tarball_path" -C "$install_dir" --strip-components=1
-
-			log_info "Creating symlink..."
-			ln -sfn "$install_dir/zen" "${HOME}/.local/bin/zen"
-
-			rm "$tarball_path"
-			log_success "Zen Browser installed at: $install_dir"
-		else
-			log_warning "Failed to download Zen Browser"
-		fi
-			
-	}
-	
 	echo "  [1] Auto install from GitHub"
 	echo "  [2] Manual install (show instructions)"
 	echo "  [3] Skip"
@@ -522,12 +553,15 @@ zenInstall() {
 	;;
 	esac
 }
-
+ 
+### FIXING NEED INSUDE comment for collapsed function
 obsidianInstall() {
 	if command -v obsidian &>/dev/null; then
 		log_success "obsidian is already installed, skipping."
 		return
 	fi
+
+	## ADD AUTOMAIC_INSTALL SECTION ADD WITH HELP OF CASE like hyprshot,walk BUT IT HAS TO BE MOULAR OR NESTED FOR CHECKING DISTRO,AUTOMATIC FLAG AND THEN INVOKE THE INNERZEN FUNCTION AS ALL AS NEED TO BE ASKED BEFORE THIS SELCTION OPTION 
 
 	echo "  [1] Auto install from GitHub"
 	echo "  [2] Manual install (show instructions)"
@@ -559,6 +593,7 @@ obsidianInstall() {
 			fi
 		fi
 
+		### ERROR IN ITS INSTALL LIKE ERROR OF ITS NOT RPM PACKAGE 
 		if [ "$IS_FEDORA" == true ]; then
 			log_info "Downloading obsidian"
 			local pkg_url="https://github.com/obsidianmd/obsidian-releases/releases/download/v${version}/obsidian-${version}-x86_64.rpm"
@@ -612,11 +647,14 @@ vscodeThemeInstall(){
 	fi
 }
 
+### FIXING NEED INSUDE comment for collapsed function
 vscodeInstall() {
 	if command -v code &>/dev/null; then
 		log_success "vscode is already installed, skipping."
 		return
 	fi
+
+	## ADD AUTOMAIC_INSTALL SECTION ADD WITH HELP OF CASE like hyprshot,walk BUT IT HAS TO BE MOULAR OR NESTED FOR CHECKING DISTRO,AUTOMATIC FLAG AND THEN INVOKE THE INNERZEN FUNCTION AS ALL AS NEED TO BE ASKED BEFORE THIS SELCTION OPTION 
 
 	echo "  [1] Auto install from GitHub"
 	echo "  [2] Manual install (show instructions)"
@@ -644,6 +682,7 @@ vscodeInstall() {
 			fi
 		fi
 
+		### ERROR IN ITS INSTALL LIKE ERROR OF ITS NOT RPM PACKAGE 
 		if [ "$IS_FEDORA" == true ]; then
 			log_info "Downloading Vscode"
 			local pkg_url="https://code.visualstudio.com/sha/download?build=stable&os=linux-rpm-x64"
@@ -690,9 +729,12 @@ optionalInstallAll() {
 	vscodeInstall
 }
 
+### FIXING NEED INSUDE comment for collapsed function
 debianInstall(){
-	log_section "Pre-Installation Checks"
-	checkIfDebian
+	if [ "${IS_INSTALL}" == true ]; then
+		log_section "Pre-Installation Checks"
+		checkIfDebian
+	fi 
 
 	log_section "System Package Installation"
 	installPackagesDebian
@@ -709,8 +751,11 @@ debianInstall(){
 	log_section "Creating Symlinks"
 	simlinkCreate
 
-	log_section "configuring .bashrc"
-	bashAppend
+	# THIS WILL CHECK BOTH THE CONDITON BUT IF THE INSTALL.SH IS RUN IN INSTALL MODE MULTIPLE TIMES IT WILL RE-RE-RE-APPENDS BASHRC.SH TO ~/.BASHRC 
+	if [ "${IS_UPDATE}" == true ] || [ "${IS_INSTALL}" == true ] ; then
+		log_section "Pre-Installation Checks"
+		bashAppend
+	fi 
 
 	log_section "Applying GTK Theme"
 	themeApply
@@ -723,10 +768,13 @@ debianInstall(){
 	fi	
 }
 
+### FIXING NEED INSUDE comment for collapsed function
 archInstall(){
-  	log_section "Pre-Installation Checks"
-	checkIfArch
-	
+	if [ "${IS_INSTALL}" == true ]; then
+		log_section "Pre-Installation Checks"
+		checkIfArch
+	fi 
+
 	log_section "System Package Installation"
 	installPackagesArch
 
@@ -742,8 +790,11 @@ archInstall(){
 	log_section "Creating Symlinks"
 	simlinkCreate
 
-	log_section "configuring .bashrc"
-	bashAppend
+	# THIS WILL CHECK BOTH THE CONDITON BUT IF THE INSTALL.SH IS RUN IN INSTALL MODE MULTIPLE TIMES IT WILL RE-RE-RE-APPENDS BASHRC.SH TO ~/.BASHRC 
+	if [ "${IS_UPDATE}" == true ] || [ "${IS_INSTALL}" == true ] ; then
+		log_section "Pre-Installation Checks"
+		bashAppend
+	fi  
 
 	log_section "Applying GTK Theme"
 	themeApply
@@ -756,10 +807,13 @@ archInstall(){
 	fi	
 }
 
+### FIXING NEED INSUDE comment for collapsed function
 fedoraInstall(){
-  	log_section "Pre-Installation Checks"
-	checkIfFedora
-		
+	if [ "${IS_INSTALL}" == true ]; then
+		log_section "Pre-Installation Checks"
+		checkIfFedora
+	fi 
+	
 	log_section "System Package Installation"
 	installPackagesFedora
 
@@ -775,8 +829,11 @@ fedoraInstall(){
 	log_section "Creating Symlinks"
 	simlinkCreate
 
-	log_section "configuring .bashrc"
-	bashAppend
+	# THIS WILL CHECK BOTH THE CONDITON BUT IF THE INSTALL.SH IS RUN IN INSTALL MODE MULTIPLE TIMES IT WILL RE-RE-RE-APPENDS BASHRC.SH TO ~/.BASHRC 
+	if [ "${IS_UPDATE}" == true ] || [ "${IS_INSTALL}" == true ] ; then
+		log_section "Pre-Installation Checks"
+		bashAppend
+	fi 
 
 	log_section "Applying GTK Theme"
 	themeApply
@@ -834,17 +891,12 @@ restoreConfigs() {
 	log_warning "Installed packages and apps were NOT removed."
 	echo ""
 	echo "  To remove packages manually:"
+	echo "   - refer to the README.md file to know the installed packages"
+	echo "	 - then as per you distro Execute :"
+	echo "     1. Debian : sudo apt remove [Package list without comma]"
+	echo "     2. Arch   : sudo pacman -Rns [Package list without comma]"
+	echo "     3. Fedora : sudo dnf remove [Package list without comma]"
 	echo ""
-
-	if   [ "$IS_DEBIAN" == true ]; then
-		echo "  sudo apt remove waybar wofi swaybg swaync playerctl btop ddcutil"
-	elif [ "$IS_ARCH" == true ]; then
-		echo "  sudo pacman -Rns waybar wofi swaybg playerctl btop ddcutil hyprland"
-	elif [ "$IS_FEDORA" == true ]; then
-		echo "  sudo dnf remove waybar wofi swaybg playerctl btop ddcutil hyprland"
-	else
-		echo "  Remove packages using your distro's package manager"
-	fi
 
 	echo ""
 	log_info "You can now delete the repo folder:"
@@ -947,7 +999,6 @@ updateToolSimlink(){
 		log_success "updateproject symlinked to ~/.local/bin"
 	fi
 }
-
 main(){
 	if [ -z "$1" ]; then
 		echo "Error: first argument cannot be empty."
@@ -962,16 +1013,22 @@ main(){
 	while [[ $# -gt 0 ]]; do
 	case "$1" in
 		-h|--help)
-			echo "Usage: $0 [--debian] | [--arch] | [--fedora] [--no-optional] [--help]"
+			echo "Usage: $0 [--debian] | [--arch] | [--fedora] [--no-optional] [--version] [--help]"
 			echo ""
 			echo "  --debian   	-d	Install packages for Debian-based systems (apt)"
 			echo "  --arch     	-a	Install packages for Arch-based systems (pacman)"
 			echo "  --fedora   	-f	Install packages for Fedora-based systems (dnf)"
+			echo "  --yes-optional  -y	Used after 'distro tag' to install all optional apps installations"
 			echo "  --no-optional   -n	Used after 'distro tag' to Skip optional apps installations"
 			echo "  --restore       -r    	Remove symlinks and restore original configs"
 			echo "  --update        -u 	Updates the project but no backup rn"
+			echo "  --version       -v	Show projects current version and exit"
 			echo "  --help          -h	Show this help message and exit"
 			echo ""
+			exit 0
+		;;
+		-v|--version)
+			echo "${PROJECT_NAME} by 'Avdhut-code' is on version : ${RED}v$VERSION${NC} ."
 			exit 0
 		;;
 		-d|--debian)
@@ -997,6 +1054,10 @@ main(){
 		;;
 		-n|--no-optional)
 		        SKIP_OPTIONAL_INSTALLS=true
+			shift
+		;;	
+		-y|--yes-optional)
+		        AUTOMATIC_INSTALL_OPTIONAL=true
 			shift
 		;;	
 		-u|--update)
