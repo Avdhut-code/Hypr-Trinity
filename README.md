@@ -3,6 +3,24 @@
 A personal dotfile suite for Hyprland — dark, minimal, and opinionated. Ships with a full installer that handles symlinks, backups, packages, and optional apps across Debian, Arch, and Fedora based systems.
 
 ---
+> [!CAUTION]
+> **Check Hyprland support for your distro version BEFORE installing.**
+> Running this on an unsupported distro version will waste your time —
+> packages won't exist, dependencies will conflict, and the install will fail halfway through.
+>
+> Verified working:
+> - **Arch** — always up to date, no version concerns
+> - **Fedora [ 40, 41, 42 ]** — supported via `solopasha/hyprland` COPR
+> - **Fedora [ 43, 44+ ]** — ⚠ COPR not updated yet, Hyprland will fail to install
+> - **Linux Mint [ 21 / 22 ]** — supported via JaKooLit's script
+> - **Ubuntu [ 22.04 / 24.04 ]** — supported via JaKooLit's script
+<!-- > - **Debian 12 Bookworm** — supported via JaKooLit's script -->
+>
+> Before installing on Fedora, check if your version is supported:
+> [solopasha/hyprland COPR](https://copr.fedorainfracloud.org/coprs/solopasha/hyprland/)
+>
+> Before installing on Debian/Mint, check JaKooLit has a branch for your base version:
+> [JaKooLit/Ubuntu-Hyprland branches](https://github.com/JaKooLit/Ubuntu-Hyprland/branches)
 
 > [!WARNING]
 > **Do not run as root.** Symlinks will be created owned by root inside your home directory.
@@ -12,7 +30,6 @@ A personal dotfile suite for Hyprland — dark, minimal, and opinionated. Ships 
 > Recommended to run this **after** Hyprland is already installed and you are inside a Hyprland session.
 > On **Debian/Mint**, Hyprland is not installed by this script — see the [Installing Hyprland](#installing-hyprland-on-linux-mint) section first.
 > On **Arch** and **Fedora**, Hyprland is installed automatically by the script.
-
 ---
 
 # Preview
