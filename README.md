@@ -155,7 +155,7 @@ chmod +x install.sh
 **Examples:**
 ```bash
 # install on Arch, skip optional apps
-./install.sh --arch --no-optional
+./install.sh --no-optional --arch 
 
 # restore original configs
 ./install.sh --restore
