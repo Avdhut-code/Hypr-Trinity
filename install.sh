@@ -186,26 +186,25 @@ installPackagesFedora() {
 		pipewire \
 		pipewire-pulse \
 		xdg-desktop-portal-hyprland \
-		uwsm
+		uwsm \
+		fuse-libs \
+		fuse 
 
 	sudo dnf clean all 
 }
 
 repoCopyToTarget() {
-	log_info "Moving suite to permanent home: $TARGET_DIR"
+    log_info "Moving suite to permanent home: $TARGET_DIR"
 
-	if [ "$ORIGINAL_DIR" = "$TARGET_DIR" ]; then
-		log_info "Already in target directory, skipping copy."
-		return
-	fi
+    if [ "$ORIGINAL_DIR" = "$TARGET_DIR" ]; then
+        log_info "Already in target directory, skipping copy."
+        return
+    fi
 
-	mkdir -p "$TARGET_DIR"
+    mkdir -p "$TARGET_DIR"
+    rsync -a "${ORIGINAL_DIR}/" "${TARGET_DIR}/"
 
-	cp -r "${ORIGINAL_DIR}"/* "${TARGET_DIR}/"
-
-	cp -r "${ORIGINAL_DIR}"/.[^.]* "${TARGET_DIR}/" 2>/dev/null || true
-
-	log_success "Dotfiles centralized. All future operations will use $TARGET_DIR"
+    log_success "Dotfiles centralized. All future operations will use $TARGET_DIR"
 }
 
 takePermissions() {
@@ -276,12 +275,12 @@ simlinkCreate() {
 
 	mkdir -p "${HOME}/.local/bin"
 
-	ln -sfn "${TARGET_DIR}/bin/custombrightnessctl.sh"      "${HOME}/.local/bin/custombrightnessctl"
-	ln -sfn "${TARGET_DIR}/bin/custombtoplauncher.sh" 	"${HOME}/.local/bin/custombtoplauncher"
-	ln -sfn "${TARGET_DIR}/bin/customlinkopenr.sh"   	"${HOME}/.local/bin/customlinkopenr"
-	ln -sfn "${TARGET_DIR}/bin/customhyprlandexit.sh"       "${HOME}/.local/bin/customhyprlandexit"
-	ln -sfn "${TARGET_DIR}/bin/customwofisearch.sh"         "${HOME}/.local/bin/customwofisearch"
-	ln -sfn "${TARGET_DIR}/bin/customwallpaperswitcher.sh"         "${HOME}/.local/bin/customwallpaperswitcher"
+	ln -sfn "${TARGET_DIR}/bin/custombrightnessctl.sh"      	"${HOME}/.local/bin/custombrightnessctl"
+	ln -sfn "${TARGET_DIR}/bin/custombtoplauncher.sh" 		"${HOME}/.local/bin/custombtoplauncher"
+	ln -sfn "${TARGET_DIR}/bin/customlinkopenr.sh"   		"${HOME}/.local/bin/customlinkopenr"
+	ln -sfn "${TARGET_DIR}/bin/customhyprlandexit.sh"       	"${HOME}/.local/bin/customhyprlandexit"
+	ln -sfn "${TARGET_DIR}/bin/customwofisearch.sh"         	"${HOME}/.local/bin/customwofisearch"
+	ln -sfn "${TARGET_DIR}/bin/customwallpaperswitcher.sh"  	"${HOME}/.local/bin/customwallpaperswitcher"
 
 	log_info "Setting script permissions..."
 	
@@ -378,10 +377,12 @@ hyprshotInstall() {
 		log_info "Non-interactive shell detected, skipping."
 		return
 	fi
-	
-	if command -v hyprshot &>/dev/null; then
-		log_success "hyprshot is already installed, skipping."
-		return
+
+	if ! ${IS_UPDATE}; then 
+		if command -v hyprshot &>/dev/null; then
+			log_success "hyprshot is already installed, skipping."
+			return
+		fi
 	fi
 
 	if [ "${AUTOMATIC_OPTIONAL_INSATALL}" == true ] ; then
@@ -430,9 +431,11 @@ innerWalkInstall(){
 }
 
 walkInstall() {
-	if command -v walk &>/dev/null; then
-		log_success "Walk is already installed, skipping."
-		return
+	if ! ${IS_UPDATE}; then
+		if command -v walk &>/dev/null; then
+			log_success "Walk is already installed, skipping."
+			return
+		fi
 	fi
 
 	if [ "${AUTOMATIC_OPTIONAL_INSATALL}" == true ] ; then
@@ -503,11 +506,13 @@ innerZenInstall(){
 	
 zenInstall() {
 
-	if command -v zen &>/dev/null; then
-		log_success "Zen Browser is already installed, skipping."
-		return
+	if ! ${IS_UPDATE}; then 
+		if command -v zen &>/dev/null; then
+			log_success "Zen Browser is already installed, skipping."
+			return
+		fi
 	fi
-	
+
 	if [ "$AUTOMATIC_OPTIONAL_INSATALL" == true ]; then 		
 		if [ "$IS_ARCH" == true ]; then
 		        command -v yay &>/dev/null && yay -S --noconfirm zen-browser-bin || innerZenInstall
@@ -579,12 +584,14 @@ innerObsidianInstall(){
 			rm "$pkg_path"
 		;;
 		fedora)
-			local pkg_url="https://github.com/obsidianmd/obsidian-releases/releases/download/v${version}/obsidian-${version}-x86_64.rpm"
-			local pkg_path="/tmp/obsidian_${version}.rpm"
+			local pkg_url="https://github.com/obsidianmd/obsidian-releases/releases/download/v${version}/Obsidian-${version}.AppImage"
+			local pkg_path="${TARGET_DIR}/apps/obsidian_${version}.AppImage"
 			log_info "Downloading obsidian"
-			curl -L "$pkg_url" -o "$pkg_path" 
-			sudo dnf install -y "file://${pkg_path}" 
-			rm "$pkg_path"		
+			mkdir -p "${TARGET_DIR}/Apps"
+			curl -L "$pkg_url" -o "$pkg_path"
+			chmod +x "$pkg_path"
+			ln -sfn "$pkg_path" "$HOME/.local/bin/obsidian"
+			log_success "Obsidian AppImage installed at: $pkg_path"
 		;;
 		*)
 			log_error "Not the correct argument" 
@@ -593,10 +600,12 @@ innerObsidianInstall(){
 }
 
 obsidianInstall() {
-	if command -v obsidian &>/dev/null; then
-		log_success "obsidian is already installed, skipping."
-		return
-	fi
+	if ! ${IS_UPDATE}; then 
+		if command -v obsidian &>/dev/null; then
+			log_success "obsidian is already installed, skipping."
+			return
+		fi
+	fi 
 
 	if [ "$AUTOMATIC_OPTIONAL_INSATALL" == true ]; then 		
 		if [ "$IS_DEBIAN" == true ]; then
@@ -661,7 +670,7 @@ obsidianInstall() {
 	esac
 }
 
-vscodeThemeInstall(){		
+vscodeThemeInstall(){
 	local settings="${HOME}/.config/Code/User/settings.json"
 
 	if command -v code &>/dev/null; then
@@ -703,16 +712,17 @@ innerVscodeInstall(){
 		*)
 			log_error "Unavailable the correct argument" 
 		;;
-		esac
-	done
+	esac
 }
 
 vscodeInstall() {
-	if command -v code &>/dev/null; then
-		log_success "vscode is already installed, skipping."
-		return
-	fi
-
+	if ! ${IS_UPDATE}; then 
+		if command -v code &>/dev/null; then
+			log_success "vscode is already installed, skipping."
+			return
+		fi
+	fi 
+	
 	if [ "$AUTOMATIC_OPTIONAL_INSATALL" == true ]; then 		
 		if [ "$IS_DEBIAN" == true ]; then
 			innerVscodeInstall "debian"
@@ -949,7 +959,9 @@ restoreConfigs() {
 	echo "     1. Debian : sudo apt remove [Package list without comma]"
 	echo "     2. Arch   : sudo pacman -Rns [Package list without comma]"
 	echo "     3. Fedora : sudo dnf remove [Package list without comma]"
-	echo ""
+	echo "                 (Note: Obsidian on Fedora is an AppImage — just delete:"
+	echo "                 rm ${TARGET_DIR}/Apps/obsidian_*.AppImage"
+	echo "                 rm ${HOME}/.local/bin/obsidian)"
 
 	echo ""
 	log_info "You can now delete the repo folder:"
@@ -1066,19 +1078,21 @@ main(){
 	while [[ $# -gt 0 ]]; do
 	case "$1" in
 		-h|--help)
-			echo "Usage: $0  [--yes-optional] [--no-optional] [--debian] | [--arch] | [--fedora] [--version] [--help]"
-			echo ""
-			echo "  --debian   	-d	Install packages for Debian-based systems (apt)"
-			echo "  --arch     	-a	Install packages for Arch-based systems (pacman)"
-			echo "  --fedora   	-f	Install packages for Fedora-based systems (dnf)"
-			echo "  --yes-optional  -y	Used after 'distro tag' to install all optional apps installations"
-			echo "  --no-optional   -n	Used after 'distro tag' to Skip optional apps installations"
-			echo "  --restore       -r    	Remove symlinks and restore original configs"
-			echo "  --update        -u 	Updates the project but no backup rn"
-			echo "  --version       -v	Show projects current version and exit"
-			echo "  --help          -h	Show this help message and exit"
-			echo ""
-			exit 0
+		echo "Usage: $0  [--yes-optional] [--no-optional] [--debian] | [--arch] | [--fedora] [--version] [--help]"
+		echo ""
+		echo "[ Distro tag ]"
+		echo "  --debian   	  -d	Install packages for Debian-based systems (apt)"
+		echo "  --arch     	  -a	Install packages for Arch-based systems (pacman)"
+		echo "  --fedora   	  -f	Install packages for Fedora-based systems (dnf)"
+		echo ""
+		echo "  --yes-optional    -y	Used before 'Distro tag' to install all optional apps installations"
+		echo "  --no-optional     -n	Used before 'Distro tag' to skip optional apps installations"
+		echo "  --restore         -r	Remove symlinks and restore original configs"
+		echo "  --update          -u	Updates the project but no backup rn"
+		echo "  --version         -v	Show projects current version and exit"
+		echo "  --help            -h	Show this help message and exit"
+		echo ""
+		exit 0
 		;;
 		-v|--version)
 			echo "${PROJECT_NAME} by 'Avdhut-code' is on version : ${RED}v$VERSION${NC} ."

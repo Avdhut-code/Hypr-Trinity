@@ -9,3 +9,19 @@
 # OS
 Thumbs.db
 .env.local
+
+# Tools 
+/custombrightnessctl
+/custombtoplauncher
+/customhyprlandexit
+/customlinkopenr
+/customwofisearch
+/hyprshot
+/updateproject
+/walk
+/zen-browser
+/Hyprshot
+/apps
+
+# TEMP  
+change.sh
