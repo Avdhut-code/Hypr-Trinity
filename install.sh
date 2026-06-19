@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -euo pipefail # IF SOMETHING FAILS EXIT
+set -euo pipefail
 
 RED='\033[1;31m'
 GREEN='\033[1;32m'
@@ -14,14 +14,16 @@ ORIGINAL_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ### CHANGE IT ###
 ### CHNAGE THIS AS WELL AS CHANGE IN THE WHOLE REPO TO AVOID THE TYPO ERROR OF 'file not found'
 PROJECT_NAME="LinuxMintHyprlandConfig"
+
+### THIS WILL CHANGE OVER TIME
 VERSION="0.0.1"
+FEDORA_MIN_UNSUPPORTED_VERSION=43 
 
 TARGET_DIR="${HOME}/.local/share/${PROJECT_NAME}"
 BACKUP_CONFIG_LOCATION="${TARGET_DIR}/backupConfigs"
 
 SKIP_OPTIONAL_INSTALLS=false
-AUTOMATIC_INSTALL_OPTIONAL=false
-
+AUTOMATIC_OPTIONAL_INSATALL=false
 
 SYMLINK_INSTALL_TOOL=false
 
@@ -113,11 +115,19 @@ checkIfFedora() {
 		log_success "DOTFILE_SYSTEM=fedora written to .bashrc"
 	fi
 
-	log_success "System is Fedora-based"
+    	local fedora_version
+    	fedora_version=$(grep "^VERSION_ID=" /etc/os-release | cut -d= -f2)
+
+    	if [ "$fedora_version" -ge "$FEDORA_MIN_UNSUPPORTED_VERSION" ] 2>/dev/null; then
+    	    	log_warning "Fedora ${fedora_version} detected — Hyprland support via COPR may be limited"
+    	    	log_warning "Check https://copr.fedorainfracloud.org/coprs/sdegler/hyprland/ before continuing"
+    	fi
+
+    	log_success "System is Fedora-based"
 }
 
 installPackagesDebian() {
-    	sudo apt update -y
+    	sudo apt update
     	sudo apt install -y \
         	git \
 		ddcutil \
@@ -162,8 +172,8 @@ installPackagesArch() {
 
 installPackagesFedora() {
     	sudo dnf update -y
-	sudo dnf copr enable solopasha/hyprland -y
-   	sudo dnf install -y \
+	sudo dnf copr enable sdegler/hyprland -y  	
+	sudo dnf install -y \
         	git ddcutil btop htop libnotify pavucontrol \
         	wireplumber playerctl wofi swaybg \
         	gnome-terminal evince xed nemo mpv curl \
@@ -203,7 +213,7 @@ takePermissions() {
 	
 	log_info "Creating i2c group..."
 
-	sudo groupadd i2c
+	sudo groupadd i2c 2>/dev/null || true
 
 	if ! groups | grep -q i2c; then
 		sudo usermod -aG i2c "$(whoami)"
@@ -260,10 +270,7 @@ simlinkCreate() {
 	ln -sfn "${TARGET_DIR}/config/waybar" 	"${HOME}/.config/"
 	ln -sfn "${TARGET_DIR}/config/wofi" 	"${HOME}/.config/"
 	ln -sfn "${TARGET_DIR}/config/btop" 	"${HOME}/.config/"
-
-	# if [ "$IS_DEBIAN" == true ] ; then
 	ln -sfn "${TARGET_DIR}/config/swaync" 	"${HOME}/.config/"
-	# fi
 
 	log_info "Scripts to ~/.local/bin:"
 
@@ -294,22 +301,18 @@ simlinkCreate() {
 	log_success "Created symlink(s)"
 }
 
-### FIXING NEED INSUDE comment for collapsed function 
 bashAppend() {
-	### SOME BASH ERROR OF AT FROM /ETC/BASHRC LIKE SOME VAR MISSING
-	### ALSO ADD MORE ROBEST CHECK FOR NOT REPEATING APPEND
 	if [ ! -f "${HOME}/.bashrc" ]; then
 		exit_with_error "${HOME}/.bashrc not found"
 	fi
 
-	if grep -q "# === hyprland config start ===" "${HOME}/.bashrc"; then
+	if grep -q "# === HYPRLAND CONFIG START ===" "${HOME}/.bashrc"; then
 		log_info "hyprland configuration already in .bashrc (skipping)"
 		return
 	fi
 
 	if [ -f "$ORIGINAL_DIR/bashAppend.sh" ]; then
 		cat "$ORIGINAL_DIR/bashAppend.sh" >> "${HOME}/.bashrc"
-		source "${HOME}/.bashrc"
 		log_success ".bashrc configured with path export and environment variables"
 	else
 		log_warning "bashAppend.sh not found, skipping .bashrc modification"
@@ -381,7 +384,7 @@ hyprshotInstall() {
 		return
 	fi
 
-	if [ "${AUTOMATIC_INSTALL_OPTIONAL}" == true ] ; then
+	if [ "${AUTOMATIC_OPTIONAL_INSATALL}" == true ] ; then
 		innerHyprshotInstall
 		return
 	fi
@@ -432,7 +435,7 @@ walkInstall() {
 		return
 	fi
 
-	if [ "${AUTOMATIC_INSTALL_OPTIONAL}" == true ] ; then
+	if [ "${AUTOMATIC_OPTIONAL_INSATALL}" == true ] ; then
 		innerWalkInstall
 		return
 	fi
@@ -498,15 +501,22 @@ innerZenInstall(){
 		fi			
 }
 	
-### FIXING NEED INSUDE comment for collapsed function
 zenInstall() {
 
 	if command -v zen &>/dev/null; then
 		log_success "Zen Browser is already installed, skipping."
 		return
 	fi
-
-	## ADD AUTOMAIC_INSTALL SECTION ADD WITH HELP OF CASE like hyprshot,walk BUT IT HAS TO BE MOULAR OR NESTED FOR CHECKING DISTRO,AUTOMATIC FLAG AND THEN INVOKE THE INNERZEN FUNCTION AS ALL AS NEED TO BE ASKED BEFORE THIS SELCTION OPTION 
+	
+	if [ "$AUTOMATIC_OPTIONAL_INSATALL" == true ]; then 		
+		if [ "$IS_ARCH" == true ]; then
+		        command -v yay &>/dev/null && yay -S --noconfirm zen-browser-bin || innerZenInstall
+		else 
+			innerZenInstall
+		fi	
+		
+		return	
+	fi
 
 	echo "  [1] Auto install from GitHub"
 	echo "  [2] Manual install (show instructions)"
@@ -553,15 +563,54 @@ zenInstall() {
 	;;
 	esac
 }
- 
-### FIXING NEED INSUDE comment for collapsed function
+
+innerObsidianInstall(){
+	local version
+	version=$(curl -s https://api.github.com/repos/obsidianmd/obsidian-releases/releases/latest \
+	    | grep '"tag_name"' | cut -d'"' -f4 | tr -d 'v')
+	
+	case "$1" in
+		debian)
+			local pkg_url="https://github.com/obsidianmd/obsidian-releases/releases/download/v${version}/obsidian_${version}_amd64.deb"
+			local pkg_path="/tmp/obsidian_${version}.deb"
+			log_info "Downloading obsidian"
+			curl -L "$pkg_url" -o "$pkg_path" 
+			sudo apt install -y "$pkg_path" 
+			rm "$pkg_path"
+		;;
+		fedora)
+			local pkg_url="https://github.com/obsidianmd/obsidian-releases/releases/download/v${version}/obsidian-${version}-x86_64.rpm"
+			local pkg_path="/tmp/obsidian_${version}.rpm"
+			log_info "Downloading obsidian"
+			curl -L "$pkg_url" -o "$pkg_path" 
+			sudo dnf install -y "file://${pkg_path}" 
+			rm "$pkg_path"		
+		;;
+		*)
+			log_error "Not the correct argument" 
+		;;
+	esac
+}
+
 obsidianInstall() {
 	if command -v obsidian &>/dev/null; then
 		log_success "obsidian is already installed, skipping."
 		return
 	fi
 
-	## ADD AUTOMAIC_INSTALL SECTION ADD WITH HELP OF CASE like hyprshot,walk BUT IT HAS TO BE MOULAR OR NESTED FOR CHECKING DISTRO,AUTOMATIC FLAG AND THEN INVOKE THE INNERZEN FUNCTION AS ALL AS NEED TO BE ASKED BEFORE THIS SELCTION OPTION 
+	if [ "$AUTOMATIC_OPTIONAL_INSATALL" == true ]; then 		
+		if [ "$IS_DEBIAN" == true ]; then
+			innerObsidianInstall "debian"
+		fi
+		if [ "$IS_ARCH" == true ]; then
+		        command -v yay &>/dev/null && yay -S --noconfirm obsidian || innerObsidianInstall
+		fi
+		if [ "$IS_FEDORA" == true ]; then
+			innerObsidianInstall "fedora"
+		fi	
+		
+		return	
+	fi
 
 	echo "  [1] Auto install from GitHub"
 	echo "  [2] Manual install (show instructions)"
@@ -570,18 +619,9 @@ obsidianInstall() {
 	
 	
 	case "$obsidianChoice" in
-	1)
-		local version
-		version=$(curl -s https://api.github.com/repos/obsidianmd/obsidian-releases/releases/latest \
-		| grep '"tag_name"' | cut -d'"' -f4 | tr -d 'v')
-		
+	1)	
 		if [ "$IS_DEBIAN" == true ]; then
-			log_info "Downloading obsidian"
-			local pkg_url="https://github.com/obsidianmd/obsidian-releases/releases/download/v${version}/obsidian_${version}_amd64.deb"
-			local pkg_path="/tmp/obsidian_${version}.deb"
-			curl -L "$pkg_url" -o "$pkg_path" 
-			sudo apt install -y "$pkg_path" 
-			rm "$pkg_path"
+			innerObsidianInstall "debian" 
 		fi
 
 		if [ "$IS_ARCH" == true ]; then
@@ -593,17 +633,11 @@ obsidianInstall() {
 			fi
 		fi
 
-		### ERROR IN ITS INSTALL LIKE ERROR OF ITS NOT RPM PACKAGE 
 		if [ "$IS_FEDORA" == true ]; then
-			log_info "Downloading obsidian"
-			local pkg_url="https://github.com/obsidianmd/obsidian-releases/releases/download/v${version}/obsidian-${version}-x86_64.rpm"
-			local pkg_path="/tmp/obsidian_${version}.rpm"
-			curl -L "$pkg_url" -o "$pkg_path"
-			sudo dnf install -y "$pkg_path" 
-			rm "$pkg_path"
+			innerObsidianInstall "fedora" 
 		fi
 
-		log_success "Obsidian ${version} installed"
+		log_success "Obsidian installed"
 	;;
 	2)
 	echo """
@@ -647,14 +681,51 @@ vscodeThemeInstall(){
 	fi
 }
 
-### FIXING NEED INSUDE comment for collapsed function
+innerVscodeInstall(){
+	case "$1" in
+		debian)
+			log_info "Downloading Vscode"
+			local pkg_url="https://code.visualstudio.com/sha/download?build=stable&os=linux-deb-x64"
+			local pkg_path="/tmp/vscode.deb"
+			curl -L "$pkg_url" -o "$pkg_path" 
+			sudo apt install -y "$pkg_path" 
+			rm "$pkg_path"
+			vscodeThemeInstall	
+		;;
+		fedora)
+			local pkg_url="https://code.visualstudio.com/sha/download?build=stable&os=linux-rpm-x64"
+			local pkg_path="/tmp/vscode.rpm"
+			curl -L "$pkg_url" -o "$pkg_path" 
+			sudo dnf install -y "file://${pkg_path}" 
+			rm "$pkg_path"
+			vscodeThemeInstall	
+		;;
+		*)
+			log_error "Unavailable the correct argument" 
+		;;
+		esac
+	done
+}
+
 vscodeInstall() {
 	if command -v code &>/dev/null; then
 		log_success "vscode is already installed, skipping."
 		return
 	fi
 
-	## ADD AUTOMAIC_INSTALL SECTION ADD WITH HELP OF CASE like hyprshot,walk BUT IT HAS TO BE MOULAR OR NESTED FOR CHECKING DISTRO,AUTOMATIC FLAG AND THEN INVOKE THE INNERZEN FUNCTION AS ALL AS NEED TO BE ASKED BEFORE THIS SELCTION OPTION 
+	if [ "$AUTOMATIC_OPTIONAL_INSATALL" == true ]; then 		
+		if [ "$IS_DEBIAN" == true ]; then
+			innerVscodeInstall "debian"
+		fi
+		if [ "$IS_ARCH" == true ]; then
+		        command -v yay &>/dev/null && yay -S --noconfirm visual-studio-code-bin || innerVscodeInstall
+		fi
+		if [ "$IS_FEDORA" == true ]; then
+			innerVscodeInstall "fedora"
+		fi	
+		
+		return	
+	fi
 
 	echo "  [1] Auto install from GitHub"
 	echo "  [2] Manual install (show instructions)"
@@ -664,13 +735,7 @@ vscodeInstall() {
 	case "$vscodeChoice" in
 	1)
 		if [ "$IS_DEBIAN" == true ]; then
-			log_info "Downloading Vscode"
-			local pkg_url="https://code.visualstudio.com/sha/download?build=stable&os=linux-deb-x64"
-			local pkg_path="/tmp/vscode.deb"
-			curl -L "$pkg_url" -o "$pkg_path" 
-			sudo apt install -y "$pkg_path" 
-			rm "$pkg_path"
-			vscodeThemeInstall
+			innerVscodeInstall "debian"
 		fi
 
 		if [ "$IS_ARCH" == true ]; then
@@ -682,14 +747,8 @@ vscodeInstall() {
 			fi
 		fi
 
-		### ERROR IN ITS INSTALL LIKE ERROR OF ITS NOT RPM PACKAGE 
 		if [ "$IS_FEDORA" == true ]; then
-			log_info "Downloading Vscode"
-			local pkg_url="https://code.visualstudio.com/sha/download?build=stable&os=linux-rpm-x64"
-			local pkg_path="/tmp/vscode.rpm"
-			curl -L "$pkg_url" -o "$pkg_path" 
-			sudo dnf install -y "$pkg_path" 
-			rm "$pkg_path"
+			innerVscodeInstall "fedora"
 		fi
 	;;
 	2)
@@ -729,7 +788,6 @@ optionalInstallAll() {
 	vscodeInstall
 }
 
-### FIXING NEED INSUDE comment for collapsed function
 debianInstall(){
 	if [ "${IS_INSTALL}" == true ]; then
 		log_section "Pre-Installation Checks"
@@ -751,9 +809,8 @@ debianInstall(){
 	log_section "Creating Symlinks"
 	simlinkCreate
 
-	# THIS WILL CHECK BOTH THE CONDITON BUT IF THE INSTALL.SH IS RUN IN INSTALL MODE MULTIPLE TIMES IT WILL RE-RE-RE-APPENDS BASHRC.SH TO ~/.BASHRC 
 	if [ "${IS_UPDATE}" == true ] || [ "${IS_INSTALL}" == true ] ; then
-		log_section "Pre-Installation Checks"
+		log_section "Configuring .bashrc"
 		bashAppend
 	fi 
 
@@ -768,7 +825,6 @@ debianInstall(){
 	fi	
 }
 
-### FIXING NEED INSUDE comment for collapsed function
 archInstall(){
 	if [ "${IS_INSTALL}" == true ]; then
 		log_section "Pre-Installation Checks"
@@ -790,9 +846,8 @@ archInstall(){
 	log_section "Creating Symlinks"
 	simlinkCreate
 
-	# THIS WILL CHECK BOTH THE CONDITON BUT IF THE INSTALL.SH IS RUN IN INSTALL MODE MULTIPLE TIMES IT WILL RE-RE-RE-APPENDS BASHRC.SH TO ~/.BASHRC 
 	if [ "${IS_UPDATE}" == true ] || [ "${IS_INSTALL}" == true ] ; then
-		log_section "Pre-Installation Checks"
+		log_section "Configuring .bashrc"
 		bashAppend
 	fi  
 
@@ -807,7 +862,6 @@ archInstall(){
 	fi	
 }
 
-### FIXING NEED INSUDE comment for collapsed function
 fedoraInstall(){
 	if [ "${IS_INSTALL}" == true ]; then
 		log_section "Pre-Installation Checks"
@@ -829,9 +883,8 @@ fedoraInstall(){
 	log_section "Creating Symlinks"
 	simlinkCreate
 
-	# THIS WILL CHECK BOTH THE CONDITON BUT IF THE INSTALL.SH IS RUN IN INSTALL MODE MULTIPLE TIMES IT WILL RE-RE-RE-APPENDS BASHRC.SH TO ~/.BASHRC 
 	if [ "${IS_UPDATE}" == true ] || [ "${IS_INSTALL}" == true ] ; then
-		log_section "Pre-Installation Checks"
+		log_section "Configuring .bashrc"
 		bashAppend
 	fi 
 
@@ -908,55 +961,59 @@ restoreConfigs() {
 
 updateProject() {
 	log_section "Updating ${PROJECT_NAME}"
-
+	
 	if [ ! -d "${TARGET_DIR}/.git" ]; then
-		log_error "Target directory is not a git repo, cannot update"
-		log_info "Re-clone the repo to ${TARGET_DIR} and re-run install first"
-		exit 1
+	    	log_error "Target directory is not a git repo, cannot update"
+	    	log_info "Re-clone the repo to ${TARGET_DIR} and re-run install first"
+	    	exit 1
 	fi
-
+	
 	local system="${DOTFILE_SYSTEM:-}"
-
+	
 	if [ -z "$system" ]; then
-		log_error "DOTFILE_SYSTEM not set in environment"
-		log_info "Run: source ~/.bashrc  then try again"
-		log_info "Or re-run install.sh with your distro flag to set it"
-		exit 1
+	    	log_error "DOTFILE_SYSTEM not set in environment"
+	    	log_info "Run: source ~/.bashrc  then try again"
+	    	log_info "Or re-run install.sh with your distro flag to set it"
+	    	exit 1
 	fi
-
+	
 	log_info "Detected install distro: $system"
-
-	# pull latest changes
 	log_info "Pulling latest changes..."
+	
 	cd "$TARGET_DIR"
 	git pull
 	cd - >/dev/null
+	IS_UPDATE=true
+	
+	read -rp "Check for updates to optional apps (Hyprshot, Walk, Zen, Obsidian, VSCode)? (y/n) [n]: " update_optional
+	update_optional=${update_optional:-n}
+	
+	if [[ $update_optional =~ ^[Yy]$ ]]; then
+	    	SKIP_OPTIONAL_INSTALLS=false
+	    	log_info "Optional apps will be checked"
+	else
+	    	SKIP_OPTIONAL_INSTALLS=true
+	    	log_info "Optional apps will be skipped"
+	fi
 
 	case "$system" in
-		debian)
-			IS_DEBIAN=true	
-			IS_UPDATE=true
-			SKIP_OPTIONAL_INSTALLS=true  			
-			debianInstall
-		;;
-		arch)
-			IS_ARCH=true
-			IS_UPDATE=true
-			SKIP_OPTIONAL_INSTALLS=true
-			archInstall
-		;;
-		fedora)
-			IS_FEDORA=true
-			IS_UPDATE=true
-			SKIP_OPTIONAL_INSTALLS=true
-			fedoraInstall
-		;;
-		*)
-			log_error "Unknown DOTFILE_SYSTEM value: $system"
-			exit 1
-		;;
+	    	debian)
+	    	    	IS_DEBIAN=true	
+	    	    	debianInstall
+	    	;;
+	    	arch)
+	    	    	IS_ARCH=true
+	    	    	archInstall
+	    	;;
+	    	fedora)
+	    	    	IS_FEDORA=true
+	    	    	fedoraInstall
+	    	;;
+	    	*)
+	    	    	log_error "Unknown DOTFILE_SYSTEM value: $system"
+	    	    	exit 1
+	    	;;
 	esac
-
 	log_success "Update complete — re-login to apply any config changes"
 }
 
@@ -1006,14 +1063,10 @@ main(){
 		exit 1
 	fi
 
-	# if [ "${2:-}" == "--no-optional" ] || [ "${2:-}" == "-n" ]; then
-	# 	SKIP_OPTIONAL_INSTALLS=true
-	# fi
-
 	while [[ $# -gt 0 ]]; do
 	case "$1" in
 		-h|--help)
-			echo "Usage: $0 [--debian] | [--arch] | [--fedora] [--no-optional] [--version] [--help]"
+			echo "Usage: $0  [--yes-optional] [--no-optional] [--debian] | [--arch] | [--fedora] [--version] [--help]"
 			echo ""
 			echo "  --debian   	-d	Install packages for Debian-based systems (apt)"
 			echo "  --arch     	-a	Install packages for Arch-based systems (pacman)"
@@ -1030,6 +1083,22 @@ main(){
 		-v|--version)
 			echo "${PROJECT_NAME} by 'Avdhut-code' is on version : ${RED}v$VERSION${NC} ."
 			exit 0
+		;;
+		-n|--no-optional)
+		        SKIP_OPTIONAL_INSTALLS=true
+			shift
+		;;	
+		-y|--yes-optional)
+		        AUTOMATIC_OPTIONAL_INSATALL=true
+			shift
+		;;		
+		-u|--update)
+			updateProject
+			shift
+		;;
+		-r|--restore)
+			restoreConfigs
+			shift
 		;;
 		-d|--debian)
 			IS_DEBIAN=true
@@ -1052,22 +1121,7 @@ main(){
 			fedoraInstall
 			shift
 		;;
-		-n|--no-optional)
-		        SKIP_OPTIONAL_INSTALLS=true
-			shift
-		;;	
-		-y|--yes-optional)
-		        AUTOMATIC_INSTALL_OPTIONAL=true
-			shift
-		;;	
-		-u|--update)
-			updateProject
-			shift
-		;;
-		-r|--restore)
-			restoreConfigs
-			shift
-		;;
+
 		-*|*)
 			echo "Error: Unknown option $1" >&2
 			exit 1
@@ -1075,7 +1129,7 @@ main(){
 		esac
 	done
 	
-	if [ "${IS_INSTALL}" == true ]; then
+	if [ "${IS_INSTALL}" == true ]; then	
 		log_section " Install Done."
 
 		read -rp "Symlink install.sh as 'updateproject' command for easy future updates? (y/n) [y]: " link_tool
@@ -1086,7 +1140,9 @@ main(){
 			SYMLINK_INSTALL_TOOL=true
 			updateToolSimlink
 		fi
-	fi	
+	fi
+
+	log_success "Just run this now Command : source ~/.bashrc " 
 	log_success "Installation completed successfully!"
 }
 
