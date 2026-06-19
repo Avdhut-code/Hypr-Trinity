@@ -1,3 +1,4 @@
+
 # === HYPRLAND CONFIG START ===
 
 export PATH="$HOME/.local/bin:$PATH"

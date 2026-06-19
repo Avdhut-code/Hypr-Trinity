@@ -135,7 +135,7 @@ chmod +x install.sh
 
 # 3. Run with your distro flag
 ./install.sh --debian     # Debian / Ubuntu / Linux Mint
-./install.sh --arch       # Arch / Manjaro
+./install.sh --arch       # Arch 
 ./install.sh --fedora     # Fedora
 ```
 
@@ -143,13 +143,14 @@ chmod +x install.sh
 
 | Flag | Short | Description |
 |---|---|---|
-| `--debian` | `-d` | Install for Debian / Ubuntu / Linux Mint (apt) |
-| `--arch` | `-a` | Install for Arch / Manjaro (pacman + yay) |
-| `--fedora` | `-f` | Install for Fedora (dnf + COPR) |
-| `--no-optional` | `-n` | Skip optional app installs |
+| `--help` | `-h` | Show usage and exit |
 | `--restore` | `-r` | Remove symlinks and restore backed up configs |
 | `--update` | `-u` | Pull latest changes and re-apply symlinks |
-| `--help` | `-h` | Show usage and exit |
+| `--yes-optional` | `-y` | Automaticaly installs optional app no [y/n] |
+| `--no-optional` | `-n` | Skip optional app installs |
+| `--debian` | `-d` | Install for Debian / Ubuntu / Linux Mint (apt) |
+| `--arch` | `-a` | Install for Arch (pacman + yay) |
+| `--fedora` | `-f` | Install for Fedora (dnf + COPR) |
 
 **Examples:**
 ```bash
@@ -208,7 +209,7 @@ Hyprland is **not** installed by this script on Debian-based systems — too man
 Packages installed via `apt`:
 `git` `ddcutil` `btop` `htop` `libnotify-bin` `pavucontrol` `wireplumber` `pipewire` `playerctl` `wofi` `swaybg` `gnome-terminal` `evince` `xed` `nemo` `mpv` `curl`
 
-## Arch / Manjaro
+## Arch 
 
 Hyprland and all related Wayland packages are installed via `pacman`. AUR packages (Obsidian, VSCode) require `yay` — the script installs it automatically if not found.
 
