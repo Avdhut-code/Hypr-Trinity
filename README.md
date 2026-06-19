@@ -330,6 +330,7 @@ LinuxMintHyprlandConfig/
 | `bin/customhyprlandexit.sh` | `~/.local/bin/customhyprlandexit` | Individual binary symlink |
 | `bin/customlinkopenr.sh` | `~/.local/bin/customlinkopenr` | Individual binary symlink |
 | `bin/customwofisearch.sh` | `~/.local/bin/customwofisearch` | Individual binary symlink |
+| `bin/customwallpaperswitcher.sh` | `~/.local/bin/customwallpaperswitcher` | Individual binary symlink |
 | `install.sh` | `~/.local/bin/updateproject` | Optional — prompted during install |
 
 ---
