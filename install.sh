@@ -145,7 +145,8 @@ installPackagesDebian() {
 		xed \
 		nemo \
 		mpv \
-		curl
+		curl \
+		rsync
 	
     	sudo apt autoremove -y
     	sudo apt clean
@@ -167,7 +168,8 @@ installPackagesArch() {
 		pipewire-pulse \
 		polkit-gnome \
 		xdg-desktop-portal-hyprland \
-		uwsm
+		uwsm \
+		rsync
 }
 
 installPackagesFedora() {
@@ -188,7 +190,8 @@ installPackagesFedora() {
 		xdg-desktop-portal-hyprland \
 		uwsm \
 		fuse-libs \
-		fuse 
+		fuse \
+		rsync
 
 	sudo dnf clean all 
 }
@@ -243,7 +246,7 @@ backupConfigs() {
 
     	local backup_path
 
-    	backup_path="${BACKUP_CONFIG_LOCATION}/backup_$(date +%Y%m%d_%H%M%S)"
+    	backup_path="${BACKUP_CONFIG_LOCATION}/backup_$(date +%Y-%m-%d_%H-%M-%S)"
    
 	mkdir -p "$backup_path"
 
@@ -254,9 +257,7 @@ backupConfigs() {
 	[ -d "${HOME}/.config/wofi" ]   && mv "${HOME}/.config/wofi" 	 	"$backup_path"
 	[ -d "${HOME}/.config/btop" ]   && mv "${HOME}/.config/btop" 	 	"$backup_path"
 	
-	# if [ "$IS_DEBIAN" == true ]; then 
 	[ -d "${HOME}/.config/swaync" ]   && mv "${HOME}/.config/swaync" 	"${backup_path}"
-	# fi
 
 	log_success "Moved the original ${HOME}/.config to ${backup_path}"
 }
@@ -587,7 +588,7 @@ innerObsidianInstall(){
 			local pkg_url="https://github.com/obsidianmd/obsidian-releases/releases/download/v${version}/Obsidian-${version}.AppImage"
 			local pkg_path="${TARGET_DIR}/apps/obsidian_${version}.AppImage"
 			log_info "Downloading obsidian"
-			mkdir -p "${TARGET_DIR}/Apps"
+			mkdir -p "${TARGET_DIR}/apps"
 			curl -L "$pkg_url" -o "$pkg_path"
 			chmod +x "$pkg_path"
 			ln -sfn "$pkg_path" "$HOME/.local/bin/obsidian"
@@ -722,7 +723,7 @@ vscodeInstall() {
 			return
 		fi
 	fi 
-	
+
 	if [ "$AUTOMATIC_OPTIONAL_INSATALL" == true ]; then 		
 		if [ "$IS_DEBIAN" == true ]; then
 			innerVscodeInstall "debian"
@@ -924,13 +925,13 @@ restoreConfigs() {
 
 	log_info "Removing symlinks..."
 	
-	rm -f "${HOME}/.config/hypr"
-	rm -f "${HOME}/.config/waybar"
-	rm -f "${HOME}/.config/wofi"
-	rm -f "${HOME}/.config/btop"
-	rm -f "${HOME}/.config/swaync"
+	rm -rf "${HOME}/.config/hypr"
+	rm -rf "${HOME}/.config/waybar"
+	rm -rf "${HOME}/.config/wofi"
+	rm -rf "${HOME}/.config/btop"
+	rm -rf "${HOME}/.config/swaync"
 	
-	rm -f "${HOME}/.themes/Graphite-Dark"
+	rm -rf "${HOME}/.themes/Graphite-Dark"
 	
 	rm -f "${HOME}/.local/bin/custombrightnessctl"
 	rm -f "${HOME}/.local/bin/custombtoplauncher"
@@ -1081,9 +1082,9 @@ main(){
 		echo "Usage: $0  [--yes-optional] [--no-optional] [--debian] | [--arch] | [--fedora] [--version] [--help]"
 		echo ""
 		echo "[ Distro tag ]"
-		echo "  --debian   	  -d	Install packages for Debian-based systems (apt)"
-		echo "  --arch     	  -a	Install packages for Arch-based systems (pacman)"
-		echo "  --fedora   	  -f	Install packages for Fedora-based systems (dnf)"
+		echo "  --debian	-d	Install packages for Debian-based systems (apt)"
+		echo "  --arch  	-a	Install packages for Arch-based systems (pacman)"
+		echo "  --fedora	-f	Install packages for Fedora-based systems (dnf)"
 		echo ""
 		echo "  --yes-optional    -y	Used before 'Distro tag' to install all optional apps installations"
 		echo "  --no-optional     -n	Used before 'Distro tag' to skip optional apps installations"
