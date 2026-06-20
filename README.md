@@ -14,7 +14,6 @@ A personal dotfile suite for Hyprland — dark, minimal, and opinionated. Ships 
 > - **Fedora [ 43, 44+ ]** — ⚠ COPR not updated yet, Hyprland will fail to install
 > - **Linux Mint [ 21 / 22 ]** — supported via JaKooLit's script
 > - **Ubuntu [ 22.04 / 24.04 ]** — supported via JaKooLit's script
-<!-- > - **Debian 12 Bookworm** — supported via JaKooLit's script -->
 >
 > Before installing on Fedora, check if your version is supported:
 > [solopasha/hyprland COPR](https://copr.fedorainfracloud.org/coprs/solopasha/hyprland/)
