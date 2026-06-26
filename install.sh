@@ -387,7 +387,7 @@ hyprshotInstall() {
 	fi
 
 	if [ "${AUTOMATIC_OPTIONAL_INSATALL}" == true ] ; then
-		innerHyprshotInstall
+		innerHyprshotinstall
 		return
 	fi
 
@@ -398,7 +398,7 @@ hyprshotInstall() {
 
 	case "$choice" in
 	1)
-		innerHyprshotInstall		
+		innerHyprshotinstall		
 	;;
 	2)
       	echo """
@@ -974,28 +974,31 @@ restoreConfigs() {
 
 updateProject() {
 	log_section "Updating ${PROJECT_NAME}"
-	
+
 	if [ ! -d "${TARGET_DIR}/.git" ]; then
 	    	log_error "Target directory is not a git repo, cannot update"
-	    	log_info "Re-clone the repo to ${TARGET_DIR} and re-run install first"
 	    	exit 1
 	fi
-	
 	local system="${DOTFILE_SYSTEM:-}"
-	
 	if [ -z "$system" ]; then
 	    	log_error "DOTFILE_SYSTEM not set in environment"
-	    	log_info "Run: source ~/.bashrc  then try again"
-	    	log_info "Or re-run install.sh with your distro flag to set it"
+	    	exit 1
+	fi
+
+	log_info "Detected install distro: $system"
+	log_info "Pulling latest changes (auto-stashing local edits)..."
+	
+	git -C "$TARGET_DIR" pull --autostash
+	
+	if ! git -C "$TARGET_DIR" --no-pager diff --check; then
+	    	log_warning "Merge conflicts detected after update — reverting to pre-pull state"
+	    	git -C "$TARGET_DIR" reset --merge
+	    	log_error "Update aborted due to conflicts. Your local changes are safe but the update was not applied."
 	    	exit 1
 	fi
 	
-	log_info "Detected install distro: $system"
-	log_info "Pulling latest changes..."
+	log_success "Repo updated cleanly"	
 	
-	cd "$TARGET_DIR"
-	git pull
-	cd - >/dev/null
 	IS_UPDATE=true
 	
 	read -rp "Check for updates to optional apps (Hyprshot, Walk, Zen, Obsidian, VSCode)? (y/n) [n]: " update_optional
@@ -1031,19 +1034,20 @@ updateProject() {
 }
 
 installProceed(){
-	echo "This script will:"
-	echo "	• Check what distrobution you installing this onto"
-	echo "  • Install system packages (requires sudo)"
-	echo "  • Relocate suite to ~/.local/share/${PROJECT_NAME}"
-	echo "  • Create symlinks in ~/.local/bin (user-local, no sudo)"
-	echo "	• Moves the original Config folders to 'backupFolder' (folder from previous setup)"
-	echo "  • Create symlinks in ~/.config (user-local, no sudo)"
-	echo "  • Append to .bashrc with safe environment variables"
-	echo "  • Apply GTK theme with gesttings based on your desktop enviourment"
-	echo "  • Ask you to permission to install based on your desktop enviourment"
-	echo "    - [ If you used the '--no-optional' tag, will skip over the permission ]"
-	echo ""
+	cat << 'EOF'
+This script will:
+	• Check what distrobution you installing this onto
+	• Install system packages (requires sudo)
+	• Relocate suite to ~/.local/share/${PROJECT_NAME}
+	• Create symlinks in ~/.local/bin (user-local, no sudo)
+	• Moves the original Config folders to 'backupFolder' (folder from previous setup)
+	• Create symlinks in ~/.config (user-local, no sudo)
+	• Append to .bashrc with safe environment variables
+	• Apply GTK theme with gesttings based on your desktop enviourment
+	• Ask you to permission to install based on your desktop enviourment
+	  - [ If you used the '--no-optional' tag, will skip over the permission ]
 	
+EOF
 	read -p "Continue with installation? (y/n) [n]: " -r continue_install
 	continue_install=${continue_install:-n}
 
@@ -1069,6 +1073,7 @@ updateToolSimlink(){
 		log_success "updateproject symlinked to ~/.local/bin"
 	fi
 }
+
 main(){
 	if [ -z "$1" ]; then
 		echo "Error: first argument cannot be empty."
@@ -1079,24 +1084,26 @@ main(){
 	while [[ $# -gt 0 ]]; do
 	case "$1" in
 		-h|--help)
-		echo "Usage: $0  [--yes-optional] [--no-optional] [--debian] | [--arch] | [--fedora] [--version] [--help]"
-		echo ""
-		echo "[ Distro tag ]"
-		echo "  --debian	-d	Install packages for Debian-based systems (apt)"
-		echo "  --arch  	-a	Install packages for Arch-based systems (pacman)"
-		echo "  --fedora	-f	Install packages for Fedora-based systems (dnf)"
-		echo ""
-		echo "  --yes-optional    -y	Used before 'Distro tag' to install all optional apps installations"
-		echo "  --no-optional     -n	Used before 'Distro tag' to skip optional apps installations"
-		echo "  --restore         -r	Remove symlinks and restore original configs"
-		echo "  --update          -u	Updates the project but no backup rn"
-		echo "  --version         -v	Show projects current version and exit"
-		echo "  --help            -h	Show this help message and exit"
-		echo ""
+			cat << 'EOF'
+Usage: $0  [--yes-optional] [--no-optional] [--restore ] [ --update ] [--debian] | [--arch] | [--fedora] [--version] [--help]
+
+[ Distro tag ]
+  --debian	-d	Install packages for Debian-based systems (apt)
+  --arch  	-a	Install packages for Arch-based systems (pacman)
+  --fedora	-f	Install packages for Fedora-based systems (dnf)
+  
+  --yes-optional    -y	Used before 'Distro tag' to install all optional apps installations
+  --no-optional     -n	Used before 'Distro tag' to skip optional apps installations
+  --restore         -r	Remove symlinks and restore original configs
+  --update          -u	Updates the project but no backup rn
+  --version         -v	Show projects current version and exit
+  --help            -h	Show this help message and exit
+		
+EOF
 		exit 0
 		;;
 		-v|--version)
-			echo "${PROJECT_NAME} by 'Avdhut-code' is on version : ${RED}v$VERSION${NC} ."
+			printf "${PROJECT_NAME} by 'Avdhut-code' is on version : ${RED}v$VERSION${NC} .\n"
 			exit 0
 		;;
 		-n|--no-optional)

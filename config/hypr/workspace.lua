@@ -1,29 +1,74 @@
--- windowrulev2 = "workspace 1,class:^(gnome-terminal)$"
+-- workspace.lua
+-- Rewritten for the new hl.* Lua config API.
+-- hl.window_rule({...}) call per rule.
+-- See https://wiki.hypr.land/Configuring/Basics/Window-Rules/
 
-windowrulev2 = {
-    "workspace 2,class:^(zen)$",
+hl.window_rule({
+    name  = "ws2-zen",
+    match = { class = "^(zen)$" },
+    workspace = "2",
+})
 
-    "workspace 4,class:^(nemo)$",
+hl.window_rule({
+    name  = "ws4-nemo",
+    match = { class = "^(nemo)$" },
+    workspace = "4",
+})
 
-    "workspace 3,class:^(code)$",
+hl.window_rule({
+    name  = "ws3-code",
+    match = { class = "^(code)$" },
+    workspace = "3",
+})
 
-    "workspace 3,class:^(evince)$",
+hl.window_rule({
+    name  = "ws3-evince",
+    match = { class = "^(evince)$" },
+    workspace = "3",
+})
 
-    "workspace 3,title:^(Picture-in-Picture)$",
+hl.window_rule({
+    name  = "ws3-pip",
+    match = { title = "^(Picture-in-Picture)$" },
+    workspace = "3",
+})
 
-    "workspace 4,class:^(xed)$",
+hl.window_rule({
+    name  = "ws4-xed",
+    match = { class = "^(xed)$" },
+    workspace = "4",
+})
 
-    "workspace 5,class:^(gnome-calendar)$",
+hl.window_rule({
+    name  = "ws5-gnome-calendar",
+    match = { class = "^(gnome-calendar)$" },
+    workspace = "5",
+})
 
-    "workspace 6,class:^(obsidian)$",
+hl.window_rule({
+    name  = "ws6-obsidian",
+    match = { class = "^(obsidian)$" },
+    workspace = "6",
+})
 
-    "workspace 8,title:^(btop Moniter)$",
+hl.window_rule({
+    name  = "ws8-btop-monitor",
+    match = { title = "^(btop Moniter)$" },
+    workspace = "8",
+})
 
-    "workspace 10,class:^(mpv)$",
+hl.window_rule({
+    name  = "ws10-mpv",
+    match = { class = "^(mpv)$" },
+    workspace = "10",
+})
 
-    -- Exit confirmation window
-    "float, title:^(Exit-hyprland-pass)$",
-    "center, title:^(Exit-hyprland-pass)$",
-    "size 800 100, title:^(Exit-hyprland-pass)$",
-    "noanim, title:^(Exit-hyprland-pass)$",
-}
+hl.window_rule({
+    name  = "exit-hyprland-pass",
+    match = { title = "^(Exit-hyprland-pass)$" },
+
+    float    = true,
+    center   = true,
+    size     = "800 100",
+    no_anim  = true,
+})

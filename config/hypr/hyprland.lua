@@ -1,290 +1,307 @@
--- monitor=,preferred,auto,auto
--- See https://wiki.hyprland.org/Configuring/Keywords/ for more
+-- ============================================================
+-- hyprland.lua
+-- Rewritten to use ONLY the new hl.* Lua config API.
+-- See https://wiki.hypr.land/Configuring/Start/
+-- ============================================================
 
--- Execute your favorite apps at launch
--- exec-once = waybar & hyprpaper & firefox
+
+---------------------
+---- MY PROGRAMS ----
+---------------------
+
+local editor      = "vim"            -- nano
+local terminal     = "gnome-terminal" -- kitty
+local fileManager   = "nemo"           -- nautilus
+local menu          = "wofi --show drun"
+
+local mainMod  = "SUPER"
+local shiftMod = "SHIFT"
+local altMod   = "ALT"
+local ctrlMod  = "CTRL"
+
+local HOME = os.getenv("HOME")
 
 
--- Source a file (multi-file configs)
--- source = ~/.config/hypr/myColors.conf
+------------------
+---- MONITORS ----
+------------------
 
--- Set programs that you use
-local editor = "vim" -- nano
-local terminal = "gnome-terminal" -- kitty
-local fileManager = "nemo" -- nautilus
-local menu = "wofi --show drun" -- wofi -show drun
+hl.monitor({
+    output   = "",
+    mode     = "preferred",
+    position = "auto",
+    scale    = "auto",
+})
 
--- Some default env vars.
-env = {
-    "XCURSOR_SIZE,24",
-    "QT_QPA_PLATFORMTHEME,qt5ct", -- change to qt6ct if you have that
-}
 
--- For all categories, see https://wiki.hyprland.org/Configuring/Variables/
-input = {
-    kb_layout = "us",
-    kb_variant = "",
-    kb_model = "",
-    kb_options = "",
-    kb_rules = "",
+-------------------------------
+---- ENVIRONMENT VARIABLES ----
+-------------------------------
 
-    follow_mouse = 1,
+hl.env("XCURSOR_SIZE", "24")
+hl.env("QT_QPA_PLATFORMTHEME", "qt5ct") -- change to qt6ct if that's what you use
 
-    touchpad = {
-        natural_scroll = false,
+
+-------------------
+---- AUTOSTART ----
+-------------------
+
+-- This is the critical fix: in the old config this was a dead
+-- `exec_once = {...}` table. In the new API you must register a
+-- "hyprland.start" callback and explicitly call hl.exec_cmd for
+-- each program. This is what actually launches waybar, your
+-- wallpaper daemon, notifications, idle daemon, etc. on login.
+hl.on("hyprland.start", function()
+    hl.exec_cmd('swaybg -i "$CURRENT_WALLPAPER" -m fill')
+    hl.exec_cmd("swaync")
+    hl.exec_cmd("waybar")
+    hl.exec_cmd("hypridle")
+    hl.exec_cmd("custombtoplancher")
+    hl.exec_cmd("custombrightnessctl resetToDefault")
+end)
+
+
+-----------------------
+---- LOOK AND FEEL ----
+-----------------------
+
+hl.config({
+    general = {
+        gaps_in  = 1,
+        gaps_out = 1,
+
+        border_size = 1,
+
+        col = {
+            active_border = "rgb(8c8c8c)",
+        },
+
+        layout = "dwindle",
+
+        -- See https://wiki.hypr.land/Configuring/Advanced-and-Cool/Tearing/
+        allow_tearing = false,
     },
 
-    sensitivity = 0, -- -1.0 to 1.0, 0 means no modification.
-}
+    decoration = {
+        rounding = 0,
 
-general = {
-    -- See https://wiki.hyprland.org/Configuring/Variables/ for more
+        inactive_opacity = 0.5, -- 0.0 - 1.0
 
-    gaps_in = 1,
-    gaps_out = 1,
-    
-    border_size = 1,
-    ["col.active_border"] = "rgb(8c8c8c)", 
+        shadow = {
+            enabled      = true,
+            range        = 4,
+            render_power = 3,
+            color        = 0xee1a1a1a,
+        },
 
-    layout = "dwindle",
-
-    -- Please see https://wiki.hyprland.org/Configuring/Tearing/ before you turn this on
-    allow_tearing = false,
-}
-
-decoration = {
-    -- See https://wiki.hyprland.org/Configuring/Variables/ for more
-
-    rounding = 0,
-    
-    blur = {
-        enabled = true,
-        size = 3,
-        passes = 1,
+        blur = {
+            enabled = true,
+            size    = 3,
+            passes  = 1,
+        },
     },
-    inactive_opacity = 0.5, -- Range is 0.0 to 1.0
-    drop_shadow = true,
-    shadow_range = 4,
-    shadow_render_power = 3,
-    ["col.shadow"] = "rgba(1a1a1aee)",
-}
 
-animations = {
-    enabled = false,
-
-    -- Some default animations, see https://wiki.hyprland.org/Configuring/Animations/ for more
-
-    bezier = { "myBezier, 0.05, 0.9, 0.1, 1.05" },
-
-    animation = {
-        "windows, 1, 7, myBezier",
-        "windowsOut, 1, 7, default, popin 80%",
-        "border, 1, 10, default",
-        "borderangle, 1, 8, default",
-        "fade, 1, 7, default",
-        "workspaces, 1, 6, default",
+    animations = {
+        enabled = false,
     },
-}
+})
 
-dwindle = {
-    -- See https://wiki.hyprland.org/Configuring/Dwindle-Layout/ for more
-    pseudotile = true, -- master switch for pseudotiling. Enabling is bound to mainMod + P in the keybinds section below
-    preserve_split = true, -- you probably want this
-}
+-- new curve/animation API.
+hl.curve("myBezier", { type = "bezier", points = { {0.05, 0.9}, {0.1, 1.05} } })
 
--- master = {
---     -- See https://wiki.hyprland.org/Configuring/Master-Layout/ for more
---     new_is_master = true
--- }
+hl.animation({ leaf = "windows",    enabled = true, speed = 7, bezier = "myBezier" })
+hl.animation({ leaf = "windowsOut", enabled = true, speed = 7, bezier = "default", style = "popin 80%" })
+hl.animation({ leaf = "border",     enabled = true, speed = 10, bezier = "default" })
+hl.animation({ leaf = "borderangle",enabled = true, speed = 8,  bezier = "default" })
+hl.animation({ leaf = "fade",       enabled = true, speed = 7,  bezier = "default" })
+hl.animation({ leaf = "workspaces", enabled = true, speed = 6,  bezier = "default" })
 
--- gestures = {
---     -- See https://wiki.hyprland.org/Configuring/Variables/ for more
---     workspace_swipe = false
--- }
 
-misc = {
-    -- See https://wiki.hyprland.org/Configuring/Variables/ for more
-    force_default_wallpaper = -1, -- Set to 0 or 1 to disable the anime mascot wallpapers
-}
+-------------------
+---- DWINDLE -----
+-------------------
+
+hl.config({
+    dwindle = {
+        pseudotile     = true, -- master switch for pseudotiling (mainMod + P below)
+        preserve_split = true,
+    },
+})
+
+-- Master layout (left commented, same as your original)
+-- hl.config({
+--     master = {
+--         new_status = "master",
+--     },
+-- })
+
+-- Gestures (workspace swipe replacement) -- left available, commented
+-- hl.gesture({ fingers = 3, direction = "horizontal", action = "workspace" })
+
+
+----------------
+----  MISC  ----
+----------------
+
+hl.config({
+    misc = {
+        force_default_wallpaper = -1,
+    },
+})
+
+
+---------------
+---- INPUT ----
+---------------
+
+hl.config({
+    input = {
+        kb_layout  = "us",
+        kb_variant = "",
+        kb_model   = "",
+        kb_options = "",
+        kb_rules   = "",
+
+        follow_mouse = 1,
+
+        sensitivity = 0, -- -1.0 to 1.0, 0 = no modification
+
+        touchpad = {
+            natural_scroll = false,
+        },
+    },
+})
 
 -- Example per-device config
--- See https://wiki.hyprland.org/Configuring/Keywords/#per-device-input-configs for more
-device = {
-    {
-        name = "epic-mouse-v1",
-        sensitivity = -0.5,
-    },
-}
-
--- Example windowrule v1
--- windowrule = "float, ^(kitty)$"
--- Example windowrule v2
--- windowrulev2 = "float,class:^(kitty)$,title:^(kitty)$"
-
--- See https://wiki.hyprland.org/Configuring/Window-Rules/ for more
-windowrulev2 = { "suppressevent maximize, class:.*" } -- You'll probably like this.
-
-source = {
-    os.getenv("HOME") .. "/.local/share/LinuxMintHyprlandConfig/config/hypr/workspace.lua",
-}
-
--- Executed acommands 
-exec_once = {
-    'swaybg -i "$CURRENT_WALLPAPER" -m fill',
-    "swaync",
-    "waybar",
-    "hypridle",
-    "custombtoplancher",
-    "custombrightnessctl resetToDefault",
-}
-
--- See https://wiki.hyprland.org/Configuring/Keywords/ for more
-
--- Mod keys [i dont like to use capitalized SUPER<SHIFT<ALT<CTRL it sounds like im screeming some jutsu like "SUPER+T" i summong btop-moniter]
-local mainMod = "SUPER"
-local shiftMod = "SHIFT"
-local altMod = "ALT"
-local ctrlMod = "CTRL"
-
--- Example binds, see https://wiki.hyprland.org/Configuring/Binds/ for more
-bind = {
-    ------------------- APPLICATIONS -----------------
-
-    mainMod .. ", RETURN, exec, " .. terminal, -- Launch Terminal
-    ", code:118, exec, hyprlock", -- Lock Screen with the ScrLK key
-    mainMod .. ", T, exec, custombtoplancher", -- Launch Btop (custom)
-
-    mainMod .. " " .. shiftMod .. ", V, exec, code", -- Launch VSCode 
-    mainMod .. " " .. shiftMod .. ", O, exec, obsidian", -- Launch Obsidian
-    mainMod .. " " .. shiftMod .. ", F, exec, zen", -- Launch Zen Browser
-
-    mainMod .. " " .. shiftMod .. ", E, exec, " .. fileManager, -- Launch File Manager
+hl.device({
+    name        = "epic-mouse-v1",
+    sensitivity = -0.5,
+})
 
 
-    mainMod .. ", S, exec, customwallpaperswitcher + ",
-    mainMod .. " " .. shiftMod .. ", S, exec, customwallpaperswitcher - ",
-   
-    -- ----------------- WEB-APP FILE SOURCE ----------------
-   
-    table.insert(source, os.getenv("HOME") .. "/.local/share/LinuxMintHyprlandConfig/config/hypr/webappsbinds.lua")
-   
-    ------------------- WINDOW CONTROL -----------------
+--------------------------------
+---- WINDOW RULES ----
+--------------------------------
 
-    mainMod .. ", C, killactive", -- Close active window
-    mainMod .. ", X, togglefloating", -- Toggle floating
-    mainMod .. ", P, pseudo", -- Dwindle pseudo
-    mainMod .. ", J, togglesplit", -- Dwindle split toggle
-    mainMod .. ", SPACE, exec, " .. menu, -- Launch app launcher
-    mainMod .. ", Escape, exec, customhyprlandexit", -- Logout script
-    mainMod .. " " .. shiftMod .. ", Escape, exit,", -- Logging out of the hyprland WM and not the system it self
-
-    ctrlMod .. " " .. mainMod .. ", T, exec, customwofisearch", -- Launch wofi with custom style
-
-    ------------------- CONFIG EDITING -----------------
-
-    mainMod .. " " .. shiftMod .. ", H, exec, " .. terminal .. ' --title="hyprlandConfig" --command="' .. editor .. ' ' .. os.getenv("HOME") .. '/.local/share/LinuxMintHyprlandConfig/config/hypr/hyprland.conf"',
-    mainMod .. " " .. shiftMod .. ", W, exec, " .. terminal .. ' --title="waybarConfig" --command="' .. editor .. ' ' .. os.getenv("HOME") .. '/.local/share/LinuxMintHyprlandConfig/config/waybar/config.jsonc"',
-
-    -- ----------------- MEDIA KEYS -----------------
-
-    ", XF86AudioRaiseVolume, exec, wpctl set-volume -l 1.0 @DEFAULT_AUDIO_SINK@ 5%+",
-    ", XF86AudioLowerVolume, exec, wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-",
-
-    ctrlMod .. ", XF86AudioRaiseVolume, exec, wpctl set-volume -l 1.0 @DEFAULT_AUDIO_SINK@ 1%+",
-    ctrlMod .. ", XF86AudioLowerVolume, exec, wpctl set-volume @DEFAULT_AUDIO_SINK@ 1%-",
-
-    ", XF86AudioMute, exec, wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle",
-
-    ", code:127, exec, bash " .. os.getenv("HOME") .. "/.local/share/LinuxMintHyprlandConfig/config/hypr/configScripts/playerctl-toggle.sh", -- to use it as a globle audio/video controll, this key code:127 is the pause key
-
-    shiftMod .. ", code:127, exec, bash " .. os.getenv("HOME") .. "/.local/share/LinuxMintHyprlandConfig/config/hypr/configScripts/playerctl-previous.sh", -- to use it as a globle audio/video controll, this is replay the previous song  
-
-    -- --------------- Brightness Controll ----------
-    ctrlMod .. " " .. shiftMod .. ", B, exec, custombrightnessctl + 5",
-    ctrlMod .. ", B, exec,  custombrightnessctl - 5",
-
-    --Screen_Shot_Bindes from hyprshot git.
-    ", PRINT, exec, hyprshot -m output",
-    mainMod .. ", PRINT, exec, hyprshot -m window ",
-    shiftMod .. ", PRINT, exec, hyprshot -m region",
+hl.window_rule({
+    name  = "suppress-maximize-events",
+    match = { class = ".*" },
+    suppress_event = "maximize",
+})
 
 
-    -- Move focus with mainMod + arrow keys
-    mainMod .. ", left, movefocus, l",
-    mainMod .. ", right, movefocus, r",
-    mainMod .. ", up, movefocus, u",
-    mainMod .. ", down, movefocus, d",
-    --mainMod .. ", Tab, cyclenext", -- Change focus to another window
+----------------------------------
+---- SOURCED / REQUIRED FILES ----
+----------------------------------
 
-    -- movewindow with arrow keys
-    mainMod .. " " .. ctrlMod .. ", left, movewindow, l",
-    mainMod .. " " .. ctrlMod .. ", down, movewindow, d",
-    mainMod .. " " .. ctrlMod .. ", up, movewindow, u",
-    mainMod .. " " .. ctrlMod .. ", right, movewindow, r",
+package.path = package.path .. ";" .. HOME .. "/.local/share/LinuxMintHyprlandConfig/config/hypr/?.lua"
 
-    -- movewindow with arrow keys
-    --ctrlMod .. ", left,  exec, wlrctl pointer move -30 0",
-    --ctrlMod .. ", right, exec, wlrctl pointer move 30 0",
-    --ctrlMod .. ", up,    exec, wlrctl pointer move 0 -30",
-    --ctrlMod .. ", down,  exec, wlrctl pointer move 0 30",
+local function safe_require(mod)
+    local ok, err = pcall(require, mod)
+    if not ok then
+        hl.exec_cmd('notify-send "Hyprland config" "Failed to load ' .. mod .. ': ' .. tostring(err):gsub('"','\\"') .. '"')
+    end
+end
 
-    --mainMod .. " code:23, left,  exec, wlrctl pointer move -1 0",
-    --mainMod .. " code:23, right, exec, wlrctl pointer move 1 0",
-    --mainMod .. " code:23, up,    exec, wlrctl pointer move 0 -1",
-    --mainMod .. " code:23, down,  exec, wlrctl pointer move 0 1",
+safe_require("workspace")
+safe_require("webappsbinds")
 
-    --ctrlMod .. " Z, exec, wlrctl pointer click left",
-    --ctrlMod .. " X, exec, wlrctl pointer click right",
 
-    -- Switch workspaces with mainMod + [0-9]
-    mainMod .. ", 1, workspace, 1",
-    mainMod .. ", 2, workspace, 2",
-    mainMod .. ", 3, workspace, 3",
-    mainMod .. ", 4, workspace, 4",
-    mainMod .. ", 5, workspace, 5",
-    mainMod .. ", 6, workspace, 6",
-    mainMod .. ", 7, workspace, 7",
-    mainMod .. ", 8, workspace, 8",
-    mainMod .. ", 9, workspace, 9",
-    mainMod .. ", 0, workspace, 10",
+---------------------
+---- KEYBINDINGS ----
+---------------------
+-- NOTE: hl.bind() takes ONE combined "MOD + MOD + KEY" string as its
+-- first argument (e.g. "SUPER + SHIFT + V"), not separate mod/key
+-- arguments. See https://wiki.hypr.land/Configuring/Basics/Binds/
 
-    -- Move active window to a workspace with mainMod + shiftMod + [0-9]
-    mainMod .. " " .. shiftMod .. ", 1, movetoworkspace, 1",
-    mainMod .. " " .. shiftMod .. ", 2, movetoworkspace, 2",
-    mainMod .. " " .. shiftMod .. ", 3, movetoworkspace, 3",
-    mainMod .. " " .. shiftMod .. ", 4, movetoworkspace, 4",
-    mainMod .. " " .. shiftMod .. ", 5, movetoworkspace, 5",
-    mainMod .. " " .. shiftMod .. ", 6, movetoworkspace, 6",
-    mainMod .. " " .. shiftMod .. ", 7, movetoworkspace, 7",
-    mainMod .. " " .. shiftMod .. ", 8, movetoworkspace, 8",
-    mainMod .. " " .. shiftMod .. ", 9, movetoworkspace, 9",
-    mainMod .. " " .. shiftMod .. ", 0, movetoworkspace, 10",
+-- ---- Applications ----
+hl.bind(mainMod .. " + RETURN", hl.dsp.exec_cmd(terminal))
+hl.bind("code:118", hl.dsp.exec_cmd("hyprlock")) -- ScrLk to lock
+hl.bind(mainMod .. " + T", hl.dsp.exec_cmd("custombtoplancher"))
 
-    -- Example special workspace (scratchpad)
-    -- mainMod .. ", S, togglespecialworkspace, magic",
-    -- mainMod .. " " .. shiftMod .. ", S, movetoworkspace, special:magic",
+hl.bind(mainMod .. " + " .. shiftMod .. " + V", hl.dsp.exec_cmd("code"))
+hl.bind(mainMod .. " + " .. shiftMod .. " + O", hl.dsp.exec_cmd("obsidian"))
+hl.bind(mainMod .. " + " .. shiftMod .. " + F", hl.dsp.exec_cmd("zen"))
+hl.bind(mainMod .. " + " .. shiftMod .. " + E", hl.dsp.exec_cmd(fileManager))
 
-    -- Scroll through existing workspaces with mainMod + scroll
-    mainMod .. ", mouse_down, workspace, e+1",
-    mainMod .. ", mouse_up, workspace, e-1",
-}
+hl.bind(mainMod .. " + S", hl.dsp.exec_cmd("customwallpaperswitcher +"))
+hl.bind(mainMod .. " + " .. shiftMod .. " + S", hl.dsp.exec_cmd("customwallpaperswitcher -"))
 
-bindm = {
-    -- Move/resize windows with mainMod + LMB/RMB and dragging
-    mainMod .. ", mouse:272, movewindow",
-    mainMod .. ", mouse:273, resizewindow",
-}
+-- ---- Window control ----
+hl.bind(mainMod .. " + C", hl.dsp.window.close())
+hl.bind(mainMod .. " + X", hl.dsp.window.float({ action = "toggle" }))
+hl.bind(mainMod .. " + P", hl.dsp.window.pseudo())
+hl.bind(mainMod .. " + J", hl.dsp.layout("togglesplit")) -- dwindle only
+hl.bind(mainMod .. " + SPACE", hl.dsp.exec_cmd(menu))
+hl.bind(mainMod .. " + Escape", hl.dsp.exec_cmd("customhyprlandexit"))
+hl.bind(mainMod .. " + " .. shiftMod .. " + Escape", hl.dsp.exit())
 
-binde = {
-    -- Move/resize windows with mainMod with keys like mainMod+shiftMod
-    mainMod .. " " .. shiftMod .. ", right, resizeactive, 40 0",
-    mainMod .. " " .. shiftMod .. ", left,  resizeactive, -40 0",
-    mainMod .. " " .. shiftMod .. ", up,    resizeactive, 0 -40",
-    mainMod .. " " .. shiftMod .. ", down,  resizeactive, 0 40",
+hl.bind(ctrlMod .. " + " .. mainMod .. " + T", hl.dsp.exec_cmd("customwofisearch"))
 
-    -- Move the window in free state with keys like mainMod+shiftMod
-    mainMod .. ", l, moveactive, 40 0",
-    mainMod .. ", h, moveactive, -40 0",
-    mainMod .. ", j, moveactive, 0 -40",
-    mainMod .. ", k, moveactive, 0 40",
-}
+-- ---- Config editing shortcuts ----
+hl.bind(mainMod .. " + " .. shiftMod .. " + H",
+    hl.dsp.exec_cmd(terminal .. ' --title="hyprlandConfig" --command="' .. editor .. ' ' .. HOME .. '/.local/share/LinuxMintHyprlandConfig/config/hypr/hyprland.lua"'))
+hl.bind(mainMod .. " + " .. shiftMod .. " + W",
+    hl.dsp.exec_cmd(terminal .. ' --title="waybarConfig" --command="' .. editor .. ' ' .. HOME .. '/.local/share/LinuxMintHyprlandConfig/config/waybar/config.jsonc"'))
+
+-- ---- Media keys ----
+hl.bind("XF86AudioRaiseVolume", hl.dsp.exec_cmd("wpctl set-volume -l 1.0 @DEFAULT_AUDIO_SINK@ 5%+"), { repeating = true })
+hl.bind("XF86AudioLowerVolume", hl.dsp.exec_cmd("wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-"), { repeating = true })
+
+hl.bind(ctrlMod .. " + XF86AudioRaiseVolume", hl.dsp.exec_cmd("wpctl set-volume -l 1.0 @DEFAULT_AUDIO_SINK@ 1%+"), { repeating = true })
+hl.bind(ctrlMod .. " + XF86AudioLowerVolume", hl.dsp.exec_cmd("wpctl set-volume @DEFAULT_AUDIO_SINK@ 1%-"), { repeating = true })
+
+hl.bind("XF86AudioMute", hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"))
+
+-- Pause key used as a global media toggle (code:127)
+hl.bind("code:127", hl.dsp.exec_cmd("bash " .. HOME .. "/.local/share/LinuxMintHyprlandConfig/config/hypr/configScripts/playerctl-toggle.sh"))
+hl.bind(shiftMod .. " + code:127", hl.dsp.exec_cmd("bash " .. HOME .. "/.local/share/LinuxMintHyprlandConfig/config/hypr/configScripts/playerctl-previous.sh"))
+
+-- ---- Brightness control ----
+hl.bind(ctrlMod .. " + " .. shiftMod .. " + B", hl.dsp.exec_cmd("custombrightnessctl + 5"))
+hl.bind(ctrlMod .. " + B", hl.dsp.exec_cmd("custombrightnessctl - 5"))
+
+-- ---- Screenshots (hyprshot) ----
+hl.bind("PRINT", hl.dsp.exec_cmd("hyprshot -m output"))
+hl.bind(mainMod .. " + PRINT", hl.dsp.exec_cmd("hyprshot -m window"))
+hl.bind(shiftMod .. " + PRINT", hl.dsp.exec_cmd("hyprshot -m region"))
+
+-- ---- Move focus with mainMod + arrow keys ----
+hl.bind(mainMod .. " + left",  hl.dsp.focus({ direction = "left" }))
+hl.bind(mainMod .. " + right", hl.dsp.focus({ direction = "right" }))
+hl.bind(mainMod .. " + up",    hl.dsp.focus({ direction = "up" }))
+hl.bind(mainMod .. " + down",  hl.dsp.focus({ direction = "down" }))
+
+-- ---- Move window with mainMod + CTRL + arrow keys ----
+hl.bind(mainMod .. " + " .. ctrlMod .. " + left",  hl.dsp.window.move({ direction = "left" }))
+hl.bind(mainMod .. " + " .. ctrlMod .. " + down",  hl.dsp.window.move({ direction = "down" }))
+hl.bind(mainMod .. " + " .. ctrlMod .. " + up",    hl.dsp.window.move({ direction = "up" }))
+hl.bind(mainMod .. " + " .. ctrlMod .. " + right", hl.dsp.window.move({ direction = "right" }))
+
+-- ---- Switch workspaces with mainMod + [0-9] ----
+-- ---- Move active window to a workspace with mainMod + SHIFT + [0-9] ----
+for i = 1, 10 do
+    local key = i % 10 -- 10 maps to key 0
+    hl.bind(mainMod .. " + " .. tostring(key), hl.dsp.focus({ workspace = i }))
+    hl.bind(mainMod .. " + " .. shiftMod .. " + " .. tostring(key), hl.dsp.window.move({ workspace = i }))
+end
+
+-- ---- Scroll through workspaces with mainMod + mouse wheel ----
+hl.bind(mainMod .. " + mouse_down", hl.dsp.focus({ workspace = "e+1" }))
+hl.bind(mainMod .. " + mouse_up",   hl.dsp.focus({ workspace = "e-1" }))
+
+-- ---- Move/resize windows with mainMod + LMB/RMB drag ----
+hl.bind(mainMod .. " + mouse:272", hl.dsp.window.drag(),   { mouse = true })
+hl.bind(mainMod .. " + mouse:273", hl.dsp.window.resize(), { mouse = true })
+
+-- ---- Resize active window with mainMod + SHIFT + arrow keys (repeating) ----
+hl.bind(mainMod .. " + " .. shiftMod .. " + right", hl.dsp.window.resize({ x = 40,  y = 0,  relative = true }), { repeating = true })
+hl.bind(mainMod .. " + " .. shiftMod .. " + left",  hl.dsp.window.resize({ x = -40, y = 0,  relative = true }), { repeating = true })
+hl.bind(mainMod .. " + " .. shiftMod .. " + up",    hl.dsp.window.resize({ x = 0,   y = -40, relative = true }), { repeating = true })
+hl.bind(mainMod .. " + " .. shiftMod .. " + down",  hl.dsp.window.resize({ x = 0,   y = 40,  relative = true }), { repeating = true })
+
+-- ---- Move floating window with mainMod + h/j/k/l (repeating) ----
+hl.bind(mainMod .. " + l", hl.dsp.window.move({ x = 40,  y = 0,  relative = true }), { repeating = true })
+hl.bind(mainMod .. " + h", hl.dsp.window.move({ x = -40, y = 0,  relative = true }), { repeating = true })
+hl.bind(mainMod .. " + j", hl.dsp.window.move({ x = 0,   y = -40, relative = true }), { repeating = true })
+hl.bind(mainMod .. " + k", hl.dsp.window.move({ x = 0,   y = 40,  relative = true }), { repeating = true })
