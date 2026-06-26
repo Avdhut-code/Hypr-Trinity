@@ -53,11 +53,11 @@ hl.env("QT_QPA_PLATFORMTHEME", "qt5ct") -- change to qt6ct if that's what you us
 -- wallpaper daemon, notifications, idle daemon, etc. on login.
 hl.on("hyprland.start", function()
     hl.exec_cmd('swaybg -i "$CURRENT_WALLPAPER" -m fill')
-    hl.exec_cmd("swaync")
     hl.exec_cmd("waybar")
     hl.exec_cmd("hypridle")
-    hl.exec_cmd("custombtoplancher")
+    hl.exec_cmd("custombtoplauncher")
     hl.exec_cmd("custombrightnessctl resetToDefault")
+    hl.exec_cmd("swaync")
 end)
 
 
@@ -123,7 +123,7 @@ hl.animation({ leaf = "workspaces", enabled = true, speed = 2,  bezier = "defaul
 
 hl.config({
     dwindle = {
-        pseudotile     = true, -- master switch for pseudotiling (mainMod + P below)
+--         pseudotile     = true, -- master switch for pseudotiling (mainMod + P below)
         preserve_split = true,
     },
 })
@@ -217,7 +217,7 @@ safe_require("webappsbinds")
 -- ---- Applications ----
 hl.bind(mainMod .. " + RETURN", hl.dsp.exec_cmd(terminal))
 hl.bind("code:118", hl.dsp.exec_cmd("hyprlock")) -- ScrLk to lock
-hl.bind(mainMod .. " + T", hl.dsp.exec_cmd("custombtoplancher"))
+hl.bind(mainMod .. " + T", hl.dsp.exec_cmd("custombtoplauncher"))
 
 hl.bind(mainMod .. " + " .. shiftMod .. " + V", hl.dsp.exec_cmd("code"))
 hl.bind(mainMod .. " + " .. shiftMod .. " + O", hl.dsp.exec_cmd("obsidian"))

@@ -140,14 +140,13 @@ installPackagesDebian() {
 		playerctl \
 		wofi \
 		swaybg \
-        	gnome-terminal \
 		evince \
 		xed \
 		nemo \
 		mpv \
 		curl \
 		rsync \
-		
+		alacritty
 	
     	sudo apt autoremove -y
     	sudo apt clean
@@ -158,7 +157,7 @@ installPackagesArch() {
    	sudo pacman -S --noconfirm \
         	git ddcutil btop htop libnotify pavucontrol \
         	wireplumber playerctl wofi swaybg \
-        	gnome-terminal evince gedit nemo mpv curl \
+        	evince gedit nemo mpv curl \
 		hyprland \
 		hyprlock \
 		hypridle \
@@ -170,7 +169,8 @@ installPackagesArch() {
 		polkit-gnome \
 		xdg-desktop-portal-hyprland \
 		uwsm \
-		rsync
+		rsync \
+		alacritty
 }
 
 installPackagesFedora() {
@@ -179,7 +179,7 @@ installPackagesFedora() {
 	sudo dnf install -y \
         	git ddcutil btop htop libnotify pavucontrol \
         	wireplumber playerctl wofi swaybg \
-        	gnome-terminal evince xed nemo mpv curl \
+        	evince xed nemo mpv curl \
 		hyprland \
 		hyprlock \
 		hypridle \
@@ -192,7 +192,8 @@ installPackagesFedora() {
 		uwsm \
 		fuse-libs \
 		fuse \
-		rsync
+		rsync \
+		alacritty
 
 	sudo dnf clean all 
 }
@@ -272,6 +273,8 @@ simlinkCreate() {
 	ln -sfn "${TARGET_DIR}/config/wofi" 	"${HOME}/.config/"
 	ln -sfn "${TARGET_DIR}/config/btop" 	"${HOME}/.config/"
 	ln -sfn "${TARGET_DIR}/config/swaync" 	"${HOME}/.config/"
+	ln -sfn "${TARGET_DIR}/config/alacritty" 	"${HOME}/.config/"
+
 
 	log_info "Scripts to ~/.local/bin:"
 
@@ -1031,6 +1034,9 @@ updateProject() {
 	    	    	exit 1
 	    	;;
 	esac
+
+	chmod +x "${TARGET_DIR}/install.sh"
+	
 	log_success "Update complete — re-login to apply any config changes"
 }
 
@@ -1086,6 +1092,7 @@ main(){
 	case "$1" in
 		-h|--help)
 			cat << 'EOF'
+
 Usage: $0  [ --yes-optional ] [ --no-optional ] [ --restore ] [ --update ]
  	   [--debian] | [--arch] | [--fedora] [--version] [--help] 
 
@@ -1168,7 +1175,8 @@ EOF
 		fi
 	fi
 
-	log_success "Just run this now Command : source ~/.bashrc " 
+	printf "Just run this command now : ${RED} source ~/.bashrc ${NC}" 
+	
 	log_success "Installation completed successfully!"
 }
 
