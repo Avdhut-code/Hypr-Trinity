@@ -42,7 +42,7 @@
 			"8": "System",
 			"9": "Gaming",
 			"10": "Movie",
-			"active": "󱓻"
+			"active": ""
 		},
 		"persistent-workspaces": {
 			"1": [],
@@ -53,7 +53,7 @@
 		}
 	},
 	"custom/place-holder": {
-		"format": "  |  "
+		"format": " | "
 	},
 	"hyprland/window": {
 		"format": "{title}"

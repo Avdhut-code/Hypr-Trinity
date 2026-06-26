@@ -146,7 +146,8 @@ installPackagesDebian() {
 		nemo \
 		mpv \
 		curl \
-		rsync
+		rsync \
+		
 	
     	sudo apt autoremove -y
     	sudo apt clean
@@ -1077,7 +1078,7 @@ updateToolSimlink(){
 main(){
 	if [ -z "$1" ]; then
 		echo "Error: first argument cannot be empty."
-		echo "Usage: $0 [--help] [--debian | --arch | --fedora] [--no-optional]"
+		echo "Usage: $0 [ --help ] [ --yes-optional ] [ --no-optional ] [ --debian | --arch | --fedora ]"
 		exit 1
 	fi
 
@@ -1085,7 +1086,8 @@ main(){
 	case "$1" in
 		-h|--help)
 			cat << 'EOF'
-Usage: $0  [--yes-optional] [--no-optional] [--restore ] [ --update ] [--debian] | [--arch] | [--fedora] [--version] [--help]
+Usage: $0  [ --yes-optional ] [ --no-optional ] [ --restore ] [ --update ]
+ 	   [--debian] | [--arch] | [--fedora] [--version] [--help] 
 
 [ Distro tag ]
   --debian	-d	Install packages for Debian-based systems (apt)
@@ -1102,6 +1104,8 @@ Usage: $0  [--yes-optional] [--no-optional] [--restore ] [ --update ] [--debian]
 EOF
 		exit 0
 		;;
+		### NEW FLAG 
+		### Add and new tag like '--reinstall' to reinstall corepackages of somthing is broken you can just invoke this to fix that which will just call me DISTROinstall functions based on distro from the bashrc var also add check for if its been running before installing the porject 
 		-v|--version)
 			printf "${PROJECT_NAME} by 'Avdhut-code' is on version : ${RED}v$VERSION${NC} .\n"
 			exit 0

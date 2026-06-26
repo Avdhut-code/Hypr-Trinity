@@ -14,10 +14,10 @@ web_app_bind("A", "https://www.chatgpt.com/",             "chatgpt.png")
 web_app_bind("G", "https://gemini.google.com/",           "google-gemini.png")
 
 -- web_app_bind("C", "https://calendar.google.com/calendar/", "google-calendar.png")
+-- web_app_bind("H", "https://web.whatsapp.com/",             "whatsapp.png")
 
 web_app_bind("C", "https://claude.ai/",                   "claude.png")
 web_app_bind("T", "https://tasks.google.com/",             "google-tasks.png")
 web_app_bind("L", "https://notebooklm.google.com/",        "google-notebooklm.png")
-web_app_bind("H", "https://web.whatsapp.com/",             "whatsapp.png")
 web_app_bind("U", "https://github.com/Avdhut-code/",       "github-light.png")
 web_app_bind("P", "https://www.perplexity.ai/",            "perplexity.png")
