@@ -132,7 +132,7 @@
 		"signal": 10
 	},
 	"custom/test-widget": {
-		"on-click": "notify-send -i '$HOME/.local/share/LinuxMintHyprlandConfig/icon/hyprland.png' 'Hello' 'This is a test notification.'",
+		"on-click": "notify-send --hint=boolean:transient:true -i '$HOME/.local/share/LinuxMintHyprlandConfig/icon/hyprland.png' 'Hello' 'This is a test notification.'",
 		"format": "TEST CLICK ME"
 	}
 }

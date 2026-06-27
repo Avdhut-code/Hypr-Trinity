@@ -50,6 +50,6 @@ echo "$NEW_VAL" > "$CACHE_FILE"
 
 pkill -RTMIN+10 waybar 
 
-notify-send -r 9999 -t 1500 -i "$ICON" "Brightness" "$MSG"
+notify-send -r 9999 -t 1500 -i "$ICON" "Brightness" "$MSG" --hint=boolean:transient:true
 
 /usr/bin/ddcutil --bus $BUS setvcp 10 "$NEW_VAL" &>/dev/null

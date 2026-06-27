@@ -199,7 +199,7 @@ package.path = package.path .. ";" .. HOME .. "/.local/share/LinuxMintHyprlandCo
 local function safe_require(mod)
     local ok, err = pcall(require, mod)
     if not ok then
-        hl.exec_cmd('notify-send "Hyprland config" "Failed to load ' .. mod .. ': ' .. tostring(err):gsub('"','\\"') .. '"')
+        hl.exec_cmd('notify-send "Hyprland config" "Failed to load --hint=boolean:transient:true ' .. mod .. ': ' .. tostring(err):gsub('"','\\"') .. '"')
     end
 end
 
