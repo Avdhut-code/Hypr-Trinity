@@ -1,6 +1,7 @@
 # LinuxMintHyprlandConfig
 
-A personal dotfile suite for Hyprland — dark, minimal, and opinionated. Ships with a full installer that handles symlinks, backups, packages, and optional apps across Debian, Arch, and Fedora based systems.
+A personal dotfile suite for debian | arch | fedora — Hyprland  setups
+Its dark, minimal, and opinionated. Ships with a full installer that handles symlinks, backups, packages, and optional apps across Debian, Arch, and Fedora based systems.
 
 ---
 > [!CAUTION]
@@ -156,6 +157,9 @@ chmod +x install.sh
 # install on Arch, skip optional apps
 ./install.sh --no-optional --arch 
 
+# install on Arch, install all optional apps
+./install.sh --yes-optional --arch
+
 # restore original configs
 ./install.sh --restore
 
@@ -234,7 +238,7 @@ updateproject --update
 
 This will:
 1. `git pull` the latest changes from `~/.local/share/LinuxMintHyprlandConfig/`
-2. Re-run the full install for your distro — skipping optional apps and the confirmation prompt
+2. Re-run the full install for your distro — asking user for updating optional apps and take the confirmation prompt
 3. Re-apply all symlinks to pick up any new config files added in the update
 
 > [!NOTE]
@@ -316,21 +320,22 @@ LinuxMintHyprlandConfig/
 
 ## What Gets Symlinked
 
-| Source | Target | Notes |
-|---|---|---|
-| `config/hypr/` | `~/.config/hypr` | Entire folder symlinked |
-| `config/waybar/` | `~/.config/waybar` | Entire folder symlinked |
-| `config/wofi/` | `~/.config/wofi` | Entire folder symlinked |
-| `config/btop/` | `~/.config/btop` | Entire folder symlinked |
-| `config/swaync/` | `~/.config/swaync` | Entire folder symlinked |
-| `theme/gtkThemes/Graphite-Dark/` | `~/.themes/Graphite-Dark` | Theme folder symlinked |
-| `bin/custombrightnessctl.sh` | `~/.local/bin/custombrightnessctl` | Individual binary symlink |
-| `bin/custombtoplauncher.sh` | `~/.local/bin/custombtoplauncher` | Individual binary symlink |
-| `bin/customhyprlandexit.sh` | `~/.local/bin/customhyprlandexit` | Individual binary symlink |
-| `bin/customlinkopenr.sh` | `~/.local/bin/customlinkopenr` | Individual binary symlink |
-| `bin/customwofisearch.sh` | `~/.local/bin/customwofisearch` | Individual binary symlink |
-| `bin/customwallpaperswitcher.sh` | `~/.local/bin/customwallpaperswitcher` | Individual binary symlink |
-| `install.sh` | `~/.local/bin/updateproject` | Optional — prompted during install |
+| Source                           | Target                                 | Notes                              |
+| -------------------------------- | -------------------------------------- | ---------------------------------- |
+| `config/hypr/`                   | `~/.config/hypr`                       | Entire folder symlinked            |
+| `config/waybar/`                 | `~/.config/waybar`                     | Entire folder symlinked            |
+| `config/wofi/`                   | `~/.config/wofi`                       | Entire folder symlinked            |
+| `config/btop/`                   | `~/.config/btop`                       | Entire folder symlinked            |
+| `config/swaync/`                 | `~/.config/swaync`                     | Entire folder symlinked            |
+| `config/alacritty/`              | `~/.config/alacritty`                  | Entire folder symlinked            |
+| `theme/gtkThemes/Graphite-Dark/` | `~/.themes/Graphite-Dark`              | Theme folder symlinked             |
+| `bin/custombrightnessctl.sh`     | `~/.local/bin/custombrightnessctl`     | Individual binary symlink          |
+| `bin/custombtoplauncher.sh`      | `~/.local/bin/custombtoplauncher`      | Individual binary symlink          |
+| `bin/customhyprlandexit.sh`      | `~/.local/bin/customhyprlandexit`      | Individual binary symlink          |
+| `bin/customlinkopenr.sh`         | `~/.local/bin/customlinkopenr`         | Individual binary symlink          |
+| `bin/customwofisearch.sh`        | `~/.local/bin/customwofisearch`        | Individual binary symlink          |
+| `bin/customwallpaperswitcher.sh` | `~/.local/bin/customwallpaperswitcher` | Individual binary symlink          |
+| `install.sh`                     | `~/.local/bin/updateproject`           | Optional — prompted during install |
 
 ---
 
