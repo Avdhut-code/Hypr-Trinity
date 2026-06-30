@@ -56,4 +56,4 @@ else
 fi
 
 dWALL_NAME=$(basename "$SWITCHER_WALL")
-notify-send -u low "Wallpaper" "$WALL_NAME" --icon="$ICON" --hint=boolean:transient:true
+notify-send -u low "Wallpaper" "$WALL_NAME" --icon="$ICON" -t 1000 --hint=boolean:transient:true

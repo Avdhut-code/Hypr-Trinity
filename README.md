@@ -206,21 +206,21 @@ groups | grep i2c
 Hyprland is **not** installed by this script on Debian-based systems — too many version and hardware variables to automate reliably. Install it first via [JaKooLit's script](#installing-hyprland-on-linux-mint), then run this installer.
 
 Packages installed via `apt`:
-`git` `ddcutil` `btop` `htop` `libnotify-bin` `pavucontrol` `wireplumber` `pipewire` `playerctl` `wofi` `swaybg` `gnome-terminal` `evince` `xed` `nemo` `mpv` `curl`
+`git` `ddcutil` `btop` `htop` `libnotify-bin` `pavucontrol` `wireplumber` `pipewire` `playerctl` `wofi` `swaybg` `alacritty` `evince` `xed` `nemo` `mpv` `curl`
 
 ## Arch 
 
 Hyprland and all related Wayland packages are installed via `pacman`. AUR packages (Obsidian, VSCode) require `yay` — the script installs it automatically if not found.
 
 Packages installed via `pacman`:
-`git` `ddcutil` `btop` `htop` `libnotify` `pavucontrol` `wireplumber` `pipewire` `pipewire-pulse` `playerctl` `wofi` `swaybg` `gnome-terminal` `evince` `gedit` `nemo` `mpv` `curl` `hyprland` `hyprlock` `hypridle` `hyprpaper` `waybar` `swaync` `polkit-gnome` `xdg-desktop-portal-hyprland` `uwsm`
+`git` `ddcutil` `btop` `htop` `libnotify` `pavucontrol` `wireplumber` `pipewire` `pipewire-pulse` `playerctl` `wofi` `swaybg` `alacritty` `evince` `gedit` `nemo` `mpv` `curl` `hyprland` `hyprlock` `hypridle` `hyprpaper` `waybar` `swaync` `polkit-gnome` `xdg-desktop-portal-hyprland` `uwsm`
 
 ## Fedora
 
 The installer enables the `solopasha/hyprland` COPR repository automatically before installing packages. You will be prompted to confirm this by dnf.
 
 Packages installed via `dnf`:
-`git` `ddcutil` `btop` `htop` `libnotify` `pavucontrol` `wireplumber` `pipewire` `pipewire-pulse` `playerctl` `wofi` `swaybg` `gnome-terminal` `evince` `xed` `nemo` `mpv` `curl` `hyprland` `hyprlock` `hypridle` `hyprpaper` `waybar` `SwayNotificationCenter` `polkit-gnome` `xdg-desktop-portal-hyprland` `uwsm`
+`git` `ddcutil` `btop` `htop` `libnotify` `pavucontrol` `wireplumber` `pipewire` `pipewire-pulse` `playerctl` `wofi` `swaybg` `alacritty` `evince` `xed` `nemo` `mpv` `curl` `hyprland` `hyprlock` `hypridle` `hyprpaper` `waybar` `SwayNotificationCenter` `polkit-gnome` `xdg-desktop-portal-hyprland` `uwsm`
 
 ---
 

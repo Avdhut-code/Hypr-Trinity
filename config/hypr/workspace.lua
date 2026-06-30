@@ -53,7 +53,7 @@ hl.window_rule({
 
 hl.window_rule({
     name  = "ws8-btop-monitor",
-    match = { title = "^(btop Moniter)$" },
+    match = { class = "^(custombtoplauncher)$" },
     workspace = "8",
 })
 

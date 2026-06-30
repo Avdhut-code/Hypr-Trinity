@@ -13,6 +13,6 @@ ICON="$2"
  
 /usr/bin/env -S bash -c 'exec -a zenlaunch zen --new-tab "$1"' -- "$URL" &
 
-notify-send -u low "Web-App-Launcher" "$URL Opened" --icon="$ICON" --hint=boolean:transient:true
+notify-send -u low "Web-App-Launcher" "$URL Opened" --icon="$ICON" -t 1000 --hint=boolean:transient:true
  
 hyprctl dispatch workspace 2

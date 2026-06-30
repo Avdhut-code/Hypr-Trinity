@@ -10,7 +10,7 @@
 ---------------------
 
 local editor      = "vim"            -- nano
-local terminal     = "gnome-terminal" -- kitty
+local terminal     = "alacritty" -- kitty
 local fileManager   = "nemo"           -- nautilus
 local menu          = "wofi --show drun"
 
@@ -199,7 +199,7 @@ package.path = package.path .. ";" .. HOME .. "/.local/share/LinuxMintHyprlandCo
 local function safe_require(mod)
     local ok, err = pcall(require, mod)
     if not ok then
-        hl.exec_cmd('notify-send "Hyprland config" "Failed to load --hint=boolean:transient:true ' .. mod .. ': ' .. tostring(err):gsub('"','\\"') .. '"')
+        hl.exec_cmd('notify-send "Hyprland config" "Failed to load -t 1000 --hint=boolean:transient:true ' .. mod .. ': ' .. tostring(err):gsub('"','\\"') .. '"')
     end
 end
 
