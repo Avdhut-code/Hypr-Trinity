@@ -2,7 +2,7 @@
 -- Rewritten for the new hl.* Lua config API.
 
 local HOME = os.getenv("HOME")
-local ICONS = HOME .. "/.local/share/LinuxMintHyprlandConfig/icon"
+local ICONS = HOME .. "/.local/share/Hypr-Trinity/icon"
 
 local function web_app_bind(key, url, icon)
     hl.bind("SUPER + SHIFT + " .. key,

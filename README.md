@@ -1,4 +1,4 @@
-# LinuxMintHyprlandConfig
+# Hypr-Trinity
 
 A personal dotfile suite for debian | arch | fedora — Hyprland  setups
 Its dark, minimal, and opinionated. Ships with a full installer that handles symlinks, backups, packages, and optional apps across Debian, Arch, and Fedora based systems.
@@ -127,8 +127,8 @@ chmod +x install.sh
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/yourusername/LinuxMintHyprlandConfig.git
-cd LinuxMintHyprlandConfig
+git clone https://github.com/yourusername/Hypr-Trinity.git
+cd Hypr-Trinity
 
 # 2. Make executable
 chmod +x install.sh
@@ -174,7 +174,7 @@ In order:
 1. Checks you are in the correct directory and running on the right distro
 2. Writes `DOTFILE_SYSTEM=<distro>` to `~/.bashrc` for use by `updateproject`
 3. Installs system packages via your distro's package manager
-4. Copies the repo to `~/.local/share/LinuxMintHyprlandConfig/` (permanent home)
+4. Copies the repo to `~/.local/share/Hypr-Trinity/` (permanent home)
 5. Adds current user to `i2c` group for DDC-CI brightness control
 6. Backs up any existing configs from `~/.config/` to a timestamped backup folder
 7. Creates symlinks in `~/.config/` pointing to the repo configs
@@ -237,7 +237,7 @@ updateproject --update
 ```
 
 This will:
-1. `git pull` the latest changes from `~/.local/share/LinuxMintHyprlandConfig/`
+1. `git pull` the latest changes from `~/.local/share/Hypr-Trinity/`
 2. Re-run the full install for your distro — asking user for updating optional apps and take the confirmation prompt
 3. Re-apply all symlinks to pick up any new config files added in the update
 
@@ -269,7 +269,7 @@ This will:
 
 **Backup location:**
 ```
-~/.local/share/LinuxMintHyprlandConfig/backupConfigs/backup_<YYYYMMDD_HHMMSS>/
+~/.local/share/Hypr-Trinity/backupConfigs/backup_<YYYYMMDD_HHMMSS>/
 ```
 Multiple backups are kept. `--restore` always uses the most recent one.
 
@@ -280,7 +280,7 @@ Multiple backups are kept. `--restore` always uses the most recent one.
 All configs, scripts, and themes live in a single directory and are linked to their target locations via symlinks — nothing is duplicated outside the repo.
 
 ```
-LinuxMintHyprlandConfig/
+Hypr-Trinity/
 ├── bin/                              # Custom scripts (→ ~/.local/bin/)
 │   ├── custombrightnessctl.sh       # DDC-CI brightness control via ddcutil
 │   ├── custombtoplauncher.sh        # Custom btop terminal launcher
@@ -533,7 +533,7 @@ rm /tmp/obsidian.deb
 ```bash
 # replace YourVault with your actual vault folder name
 mkdir -p ~/YourVault/.obsidian/themes/
-cp -r ~/.local/share/LinuxMintHyprlandConfig/theme/Obsidian/pitchBlack \
+cp -r ~/.local/share/Hypr-Trinity/theme/Obsidian/pitchBlack \
     ~/YourVault/.obsidian/themes/
 ```
 

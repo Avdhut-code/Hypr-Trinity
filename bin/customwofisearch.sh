@@ -3,7 +3,7 @@
 USER_INPUT=$(
   wofi \
     --dmenu \
-    --style "$HOME/.local/share/LinuxMintHyprlandConfig/config/wofi/wofisearchstyle.css"
+    --style "$HOME/.local/share/Hypr-Trinity/config/wofi/wofisearchstyle.css"
 )
 
 if [ -z "$USER_INPUT" ]; then

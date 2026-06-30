@@ -13,7 +13,7 @@ ORIGINAL_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 ### CHANGE IT ###
 ### CHNAGE THIS AS WELL AS CHANGE IN THE WHOLE REPO TO AVOID THE TYPO ERROR OF 'file not found'
-PROJECT_NAME="LinuxMintHyprlandConfig"
+PROJECT_NAME="Hypr-Trinity"
 
 ### THIS WILL CHANGE OVER TIME
 VERSION="0.0.1"

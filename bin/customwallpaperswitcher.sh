@@ -1,8 +1,8 @@
 #!/bin/bash
 
-WALLPAPER_DIR="$HOME/.local/share/LinuxMintHyprlandConfig/wallpaper"
-STATE_FILE="$HOME/.local/share/LinuxMintHyprlandConfig/.wallpaper_state"
-ICON="$HOME/.local/share/LinuxMintHyprlandConfig/icon/wallpaper-switcher.png"
+WALLPAPER_DIR="$HOME/.local/share/Hypr-Trinity/wallpaper"
+STATE_FILE="$HOME/.local/share/Hypr-Trinity/.wallpaper_state"
+ICON="$HOME/.local/share/Hypr-Trinity/icon/wallpaper-switcher.png"
 BASHRC="$HOME/.bashrc"
 
 if [ -z "$1" ]; then

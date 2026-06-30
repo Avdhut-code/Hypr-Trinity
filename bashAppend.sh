@@ -4,7 +4,7 @@
 export PATH="$HOME/.local/bin:$PATH"
 
 # Point to the permanent dotfiles suite location
-export TARGET_DIR="$HOME/.local/share/LinuxMintHyprlandConfig"
+export TARGET_DIR="$HOME/.local/share/Hypr-Trinity"
 
 # short hand function
 function lk {
