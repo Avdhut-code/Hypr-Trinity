@@ -238,9 +238,9 @@ hl.bind(ctrlMod .. " + " .. mainMod .. " + T", hl.dsp.exec_cmd("customwofisearch
 
 -- ---- Config editing shortcuts ----
 hl.bind(mainMod .. " + " .. shiftMod .. " + H",
-    hl.dsp.exec_cmd(terminal .. ' --title="hyprlandConfig" --command="' .. editor .. ' ' .. HOME .. '/.local/share/Hypr-Trinity/config/hypr/hyprland.lua"'))
+    hl.dsp.exec_cmd(terminal .. ' --title "hyprlandConfig" --command "' .. editor .. ' ' .. HOME .. '/.local/share/Hypr-Trinity/config/hypr/hyprland.lua"'))
 hl.bind(mainMod .. " + " .. shiftMod .. " + W",
-    hl.dsp.exec_cmd(terminal .. ' --title="waybarConfig" --command="' .. editor .. ' ' .. HOME .. '/.local/share/Hypr-Trinity/config/waybar/config.jsonc"'))
+    hl.dsp.exec_cmd(terminal .. ' --title "waybarConfig" --command "' .. editor .. ' ' .. HOME .. '/.local/share/Hypr-Trinity/config/waybar/config.jsonc"'))
 
 -- ---- Media keys ----
 hl.bind("XF86AudioRaiseVolume", hl.dsp.exec_cmd("wpctl set-volume -l 1.0 @DEFAULT_AUDIO_SINK@ 5%+"), { repeating = true })
