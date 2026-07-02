@@ -11,11 +11,8 @@ NC='\033[0m'
 ### THERE IS SOME ISSUE WITH THIS 
 ORIGINAL_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-### CHANGE IT ###
-### CHNAGE THIS AS WELL AS CHANGE IN THE WHOLE REPO TO AVOID THE TYPO ERROR OF 'file not found'
 PROJECT_NAME="Hypr-Trinity"
 
-### THIS WILL CHANGE OVER TIME
 VERSION="0.0.1"
 FEDORA_MIN_UNSUPPORTED_VERSION=43 
 
@@ -268,13 +265,12 @@ simlinkCreate() {
 	mkdir -p "${HOME}/.config"
 
 	log_info "Config directories:"
-	ln -sfn "${TARGET_DIR}/config/hypr" 	"${HOME}/.config/"
-	ln -sfn "${TARGET_DIR}/config/waybar" 	"${HOME}/.config/"
-	ln -sfn "${TARGET_DIR}/config/wofi" 	"${HOME}/.config/"
-	ln -sfn "${TARGET_DIR}/config/btop" 	"${HOME}/.config/"
-	ln -sfn "${TARGET_DIR}/config/swaync" 	"${HOME}/.config/"
+	ln -sfn "${TARGET_DIR}/config/hypr" 		"${HOME}/.config/"
+	ln -sfn "${TARGET_DIR}/config/waybar" 		"${HOME}/.config/"
+	ln -sfn "${TARGET_DIR}/config/wofi" 		"${HOME}/.config/"
+	ln -sfn "${TARGET_DIR}/config/btop" 		"${HOME}/.config/"
+	ln -sfn "${TARGET_DIR}/config/swaync" 		"${HOME}/.config/"
 	ln -sfn "${TARGET_DIR}/config/alacritty" 	"${HOME}/.config/"
-
 
 	log_info "Scripts to ~/.local/bin:"
 
@@ -596,6 +592,16 @@ innerObsidianInstall(){
 			curl -L "$pkg_url" -o "$pkg_path"
 			chmod +x "$pkg_path"
 			ln -sfn "$pkg_path" "$HOME/.local/bin/obsidian"
+			touch "${TARGET_DIR}/apps/obsidian.desktop"
+			echo """ [Desktop Entry]
+				Name=Obsidian
+				Exec=obsidian
+				Terminal=false
+				Type=Editor
+				Categories=Editor;Development;
+				""" > "${TARGET_DIR}/apps/obsidian.desktop"
+			mkdir -p "$HOME/.local/share/applications"
+			ln -sfn "${TARGET_DIR}/apps/obsidian.desktop" "$HOME/.local/share/applications/obsidian.desktop"
 			log_success "Obsidian AppImage installed at: $pkg_path"
 		;;
 		*)
@@ -690,7 +696,8 @@ vscodeThemeInstall(){
 		if [ -f "$settings" ]; then
 			sed -i 's/"workbench.colorTheme": ".*"/"workbench.colorTheme": "Pitch Black"/' "$settings"
 		else
-			echo '{ "workbench.colorTheme": "Pitch Black" }' > "$settings"
+			echo '{ "workbench.colorTheme": "Pitch Black" }' >>"$settings"
+			echo '{ "editor.fontFamily": "JetBrainsMono Nerd Font" }' >> "$settings"
 		fi		
 	fi
 }
@@ -978,6 +985,8 @@ restoreConfigs() {
 
 updateProject() {
 	log_section "Updating ${PROJECT_NAME}"
+
+	chmod +x "${TARGET_DIR}/install.sh"
 
 	if [ ! -d "${TARGET_DIR}/.git" ]; then
 	    	log_error "Target directory is not a git repo, cannot update"

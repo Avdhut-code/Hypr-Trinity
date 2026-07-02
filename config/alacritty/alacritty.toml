@@ -9,7 +9,7 @@ blur = true
 size = 10.0
 
 [font.normal]
-family = "monospace"
+family = "JetBrainsMono Nerd Font"
 style = "Regular"
 
 # Color scheme (Example: One Dark style)

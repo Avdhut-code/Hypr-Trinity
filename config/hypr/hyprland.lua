@@ -214,6 +214,8 @@ safe_require("webappsbinds")
 
 -- ---- Applications ----
 hl.bind(mainMod .. " + RETURN", hl.dsp.exec_cmd(terminal))
+
+-- If the code:118 for ScrLk key is not working, try to make one your own custom keybind in your DE and use that keybind here instead. Use command 'wev' to find the keycode by looking at "key: 127; state: 1 (pressed)" for keyboard key or just use the letter it self
 hl.bind("code:118", hl.dsp.exec_cmd("hyprlock")) -- ScrLk to lock
 hl.bind(mainMod .. " + T", hl.dsp.exec_cmd("custombtoplauncher"))
 
@@ -238,9 +240,11 @@ hl.bind(ctrlMod .. " + " .. mainMod .. " + T", hl.dsp.exec_cmd("customwofisearch
 
 -- ---- Config editing shortcuts ----
 hl.bind(mainMod .. " + " .. shiftMod .. " + H",
-    hl.dsp.exec_cmd(terminal .. ' --title "hyprlandConfig" --command "' .. editor .. ' ' .. HOME .. '/.local/share/Hypr-Trinity/config/hypr/hyprland.lua"'))
+hl.dsp.exec_cmd(terminal .. ' --title "hyprlandConfig" --command bash -c "' .. editor .. ' ' .. HOME .. '/.local/share/Hypr-Trinity/config/hypr/hyprland.lua"'))
+
 hl.bind(mainMod .. " + " .. shiftMod .. " + W",
-    hl.dsp.exec_cmd(terminal .. ' --title "waybarConfig" --command "' .. editor .. ' ' .. HOME .. '/.local/share/Hypr-Trinity/config/waybar/config.jsonc"'))
+hl.dsp.exec_cmd(terminal .. ' --title "waybarConfig" --command bash -c "' .. editor .. ' ' .. HOME .. '/.local/share/Hypr-Trinity/config/waybar/config.jsonc"'))
+
 
 -- ---- Media keys ----
 hl.bind("XF86AudioRaiseVolume", hl.dsp.exec_cmd("wpctl set-volume -l 1.0 @DEFAULT_AUDIO_SINK@ 5%+"), { repeating = true })
@@ -254,7 +258,7 @@ hl.bind("XF86AudioMute", hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SINK@ to
 -- Pause key used as a global media toggle (code:127)
 hl.bind("code:127", hl.dsp.exec_cmd("bash " .. HOME .. "/.local/share/Hypr-Trinity/config/hypr/configScripts/playerctl-toggle.sh"))
 hl.bind(shiftMod .. " + code:127", hl.dsp.exec_cmd("bash " .. HOME .. "/.local/share/Hypr-Trinity/config/hypr/configScripts/playerctl-previous.sh"))
-
+hl.bind(ctrlMod .. " + code:127", hl.dsp.exec_cmd("bash " .. HOME .. "/.local/share/Hypr-Trinity/config/hypr/configScripts/playerctl-next.sh"))
 -- ---- Brightness control ----
 hl.bind(ctrlMod .. " + " .. shiftMod .. " + B", hl.dsp.exec_cmd("custombrightnessctl + 5"))
 hl.bind(ctrlMod .. " + B", hl.dsp.exec_cmd("custombrightnessctl - 5"))

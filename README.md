@@ -127,7 +127,7 @@ chmod +x install.sh
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/yourusername/Hypr-Trinity.git
+git clone https://github.com/Avdhut-code/Hypr-Trinity.git
 cd Hypr-Trinity
 
 # 2. Make executable
