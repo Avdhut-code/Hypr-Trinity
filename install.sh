@@ -361,6 +361,50 @@ themeApply() {
 	esac
 }
 
+fontInstall() {
+	log_section "Installing Font"
+	
+	local font_name="JetBrainsMono"
+	local font_dir="${TARGET_DIR}/fonts"
+
+	if fc-list | grep -qi "JetBrainsMono Nerd Font"; then
+		log_success "JetBrainsMono Nerd Font already installed, skipping."
+		return
+	fi
+
+	log_info "Downloading ${font_name} Nerd Font..."
+	
+	mkdir -p "$font_dir"
+
+	local tarball_path="/tmp/${font_name}.tar.xz"
+	
+    	local download_url="https://github.com/ryanoasis/nerd-fonts/releases/latest/download/${font_name}.tar.xz"
+
+	if curl -L "$download_url" -o "$tarball_path"; then
+		log_info "Extracting font..."
+
+		mkdir -p "${font_dir}/${font_name}"
+
+		tar -xf "$tarball_path" -C "${font_dir}/${font_name}"
+
+		rm "$tarball_path"
+
+		log_info "Symlinking to ~/.local/share/fonts..."
+		
+		mkdir -p "${HOME}/.local/share/fonts"
+
+		ln -sfn "${TARGET_DIR}/fonts/${font_name}" "${HOME}/.local/share/fonts/"
+
+		log_info "Refreshing font cache..."
+
+		fc-cache -f "${HOME}/.local/share/fonts" 2>/dev/null || log_warning "fc-cache failed — you may need to run it manually"
+
+		log_success "${font_name} Nerd Font installed"
+	else
+		log_warning "Failed to download font"
+	fi
+}
+
 innerHyprshotinstall(){
 	log_info "Cloning Hyprshot..."
 	if git clone https://github.com/Gustash/hyprshot.git "${HOME}/Hyprshot" 2>/dev/null; then
@@ -839,6 +883,9 @@ debianInstall(){
 	log_section "Applying GTK Theme"
 	themeApply
 
+	log_section "Installing Fonts"
+	fontInstall
+
 	if  [ "$SKIP_OPTIONAL_INSTALLS" == true ]; then
 		log_info "Optional app installations will be skipped"
 	else
@@ -876,6 +923,10 @@ archInstall(){
 	log_section "Applying GTK Theme"
 	themeApply
 
+	log_section "Installing Fonts"
+	fontInstall
+
+
 	if  [ "$SKIP_OPTIONAL_INSTALLS" == true ]; then
 		log_info "Optional app installations will be skipped"
 	else
@@ -912,6 +963,10 @@ fedoraInstall(){
 
 	log_section "Applying GTK Theme"
 	themeApply
+
+	log_section "Installing Fonts"
+	fontInstall
+
 
 	if  [ "$SKIP_OPTIONAL_INSTALLS" == true ]; then
 		log_info "Optional app installations will be skipped"
