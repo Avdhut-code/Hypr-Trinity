@@ -28,12 +28,6 @@ hl.window_rule({
 })
 
 hl.window_rule({
-    name  = "ws3-pip",
-    match = { title = "^(Picture-in-Picture)$" },
-    workspace = "3",
-})
-
-hl.window_rule({
     name  = "ws4-xed",
     match = { class = "^(xed)$" },
     workspace = "4",
@@ -65,8 +59,7 @@ hl.window_rule({
 
 hl.window_rule({
     name  = "exit-hyprland-pass",
-    match = { title = "^(Exit-hyprland-pass)$" },
-
+    match = { class = "^(exit-hyprland-pass)$" },
     float    = true,
     center   = true,
     size     = "800 100",

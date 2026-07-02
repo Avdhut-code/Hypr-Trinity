@@ -1,7 +1,12 @@
-#!/bin/sh
+#!/bin/bash
 
-playerctl next
+playerctl next || notify-send -t 1000 \
+	--hint=boolean:transient:true \
+	-i "$HOME/.local/share/Hypr-Trinity/icon/playerctl-play-pause.png" \
+	"Audio/Video Ctl" \
+	"$(playerctl metadata --format 'No player is running')"
 sleep 1
+
 notify-send -t 1000 \
 	--hint=boolean:transient:true \
 	-i "$HOME/.local/share/Hypr-Trinity/icon/playerctl-play-pause.png" \

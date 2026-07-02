@@ -1,0 +1,33 @@
+[window]
+padding = { x = 24, y = 24 }  # Adds clean spacing around the text box
+opacity = 1.0                # Keeps background solid for maximum legibility
+
+[colors.primary]
+background = '#fafafa'       # Clean, bright off-white background
+foreground = '#111111'       # Deep black/dark gray text for maximum contrast
+
+[colors.cursor]
+text = '#fafafa'
+cursor = '#111111'
+
+# Normal colors (deepened for extreme clarity on light backgrounds)
+[colors.normal]
+black   = '#111111'
+red     = '#c01c28'
+green   = '#26a269'
+yellow  = '#a2730c'
+blue    = '#1a5fb4'          # Darker, vivid blue for the option keys like [s], [e]
+magenta = '#9c4075'
+cyan    = '#007a87'          # Crisp teal/cyan 
+white   = '#e8e8e8'
+
+# Bright colors
+[colors.bright]
+black   = '#5f5f5f'
+red     = '#f66151'
+green   = '#33da7a'
+yellow  = '#e5a50a'
+blue    = '#3584e4'
+magenta = '#c061cb'
+cyan    = '#2aa1b3'
+white   = '#ffffff'

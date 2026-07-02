@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 playerctl play-pause
 notify-send -t 1000 \

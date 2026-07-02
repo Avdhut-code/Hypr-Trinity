@@ -52,12 +52,20 @@ hl.env("QT_QPA_PLATFORMTHEME", "qt5ct") -- change to qt6ct if that's what you us
 -- each program. This is what actually launches waybar, your
 -- wallpaper daemon, notifications, idle daemon, etc. on login.
 hl.on("hyprland.start", function()
-    hl.exec_cmd('swaybg -i "$CURRENT_WALLPAPER" -m fill')
-    hl.exec_cmd("waybar")
-    hl.exec_cmd("hypridle")
-    hl.exec_cmd("custombtoplauncher")
-    hl.exec_cmd("custombrightnessctl resetToDefault")
-    hl.exec_cmd("swaync")
+
+	hl.exec_cmd("swaybg -i '$CURRENT_WALLPAPER' -m fill")
+	hl.exec_cmd("waybar")
+    	hl.exec_cmd("hypridle")
+    	hl.exec_cmd("custombtoplauncher")
+    	hl.exec_cmd("custombrightnessctl resetToDefault")
+    	hl.exec_cmd("swaync")
+
+	-- there is some problem with waybar not starting on some systems, so this is a workaround to check if it's running and start it if not
+	local process = "waybar"
+	local fallback = "waybar &"	
+	if not os.execute("pgrep -x " .. process .. " > /dev/null 2>&1") then
+	    os.execute(fallback)
+	end	
 end)
 
 

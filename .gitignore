@@ -25,3 +25,4 @@ Thumbs.db
 
 # TEMP  
 change.sh
+config/hypr/configScripts/waybar-start.sh

@@ -4,7 +4,7 @@ set -e
 SCRIPT_PATH=$(realpath "$0")
 
 if [ "$1" != "--interactive" ]; then
-	alacritty --class exit-hyprland-pass -T "Exit-hyprland-pass" -e bash "$SCRIPT_PATH" --interactive
+	alacritty --config-file "${HOME}/.local/share/Hypr-Trinity/config/alacritty/exit-config.toml" --class exit-hyprland-pass -T "Exit-hyprland-pass" -e bash "$SCRIPT_PATH" --interactive
 	exit 0
 fi
 
