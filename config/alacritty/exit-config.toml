@@ -2,6 +2,10 @@
 padding = { x = 24, y = 24 }  # Adds clean spacing around the text box
 opacity = 1.0                # Keeps background solid for maximum legibility
 
+# Font settings
+[font]
+size = 12.0
+
 [colors.primary]
 background = '#fafafa'       # Clean, bright off-white background
 foreground = '#111111'       # Deep black/dark gray text for maximum contrast

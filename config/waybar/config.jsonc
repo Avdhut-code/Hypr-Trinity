@@ -38,11 +38,11 @@
 			"4": "4",
 			"5": "5",
 			"6": "6",
-			"7": "Music",
-			"8": "System",
-			"9": "Gaming",
-			"10": "Movie",
-			"active": ""
+			"7": "7",
+			"8": "8",
+			"9": "9",
+			"10": "10",
+			"active": "󱓻"
 		},
 		"persistent-workspaces": {
 			"1": [],
@@ -63,8 +63,8 @@
 		"on-click": "gnome-calendar"
 	},
 	"network": {
-		"format-wifi": " how the fuck ar yu running on wifi on your PC??",
-		"format-ethernet": " Online",
+		"format-wifi": "󰖩 Online",
+		"format-ethernet": "󰖩 Online",
 		"format-disconnected": "󰤭 Offline",
 		"on-click": "nm-connection-editor"
 	},
@@ -86,7 +86,7 @@
 		"on-click": "xed"
 	},
 	"custom/Menu": {
-		"format": "☰  ",
+		"format": "☰ ",
 		"tooltip": "for killing rogue window.",
 		"on-click": "wofi --show drun"
 	},
@@ -95,7 +95,7 @@
 		"format": "{icon}",
 		"format-icons": {
 			"notification": "<span foreground='red'><sup></sup></span>",
-			"none": "",
+			"none": " ",
 			"dnd-notification": "<span foreground='red'><sup></sup></span>",
 			"dnd-none": ""
 		},
@@ -126,7 +126,7 @@
 	"custom/brightness": {
 		"exec": "custombrightnessctl",
 		"return-type": "",
-		"format": "󰃠  {}%",
+		"format": "󰃠 {}%",
 		"interval": "once",
 		"on-click": "custombrightnessctl resetToDefault",
 		"signal": 10

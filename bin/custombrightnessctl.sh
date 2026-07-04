@@ -1,8 +1,8 @@
 #!/bin/bash
 
 DefaultBrightnessLevel=15 
-BUS=2 # change this according to you 
-CACHE_FILE="/tmp/current_brightness"
+BUS=$(ddcutil detect | grep -oP '/dev/i2c-\K\d+' | head -n 1)
+CACHE_FILE="$HOME/.local/share/Hypr-Trinity/.current_brightness"
 
 ICON_UP="$HOME/.local/share/Hypr-Trinity/icon/brightness-increase.png"
 ICON_DOWN="$HOME/.local/share/Hypr-Trinity/icon/brightness-decrease.png"
@@ -12,7 +12,7 @@ if [ -z "$1" ]; then
     if [ -f "$CACHE_FILE" ]; then
         cat "$CACHE_FILE"
     else
-        CURRENT_VAL=$(ddcutil --bus $BUS getvcp 10 | grep -oP 'current value =\s+\K\d+') || CURRENT_VAL=$(ddcutil getvcp 10 | grep -oP 'current value =\s+\K\d+')
+        CURRENT_VAL=$(ddcutil --bus $BUS getvcp 10 | grep -oP 'current value =\s+\K\d+')        
         echo "$CURRENT_VAL" > "$CACHE_FILE"
         echo "$CURRENT_VAL"
     fi
@@ -22,7 +22,7 @@ fi
 if [ -f "$CACHE_FILE" ]; then
     CURRENT_VAL=$(cat "$CACHE_FILE")
 else
-    CURRENT_VAL=$(ddcutil --bus $BUS getvcp 10 | grep -oP 'current value =\s+\K\d+') || CURRENT_VAL=$(ddcutil getvcp 10 | grep -oP 'current value =\s+\K\d+')
+    CURRENT_VAL=$(ddcutil --bus $BUS getvcp 10 | grep -oP 'current value =\s+\K\d+')        
 fi
 
 if ! [[ "$CURRENT_VAL" =~ ^[0-9]+$ ]]; then

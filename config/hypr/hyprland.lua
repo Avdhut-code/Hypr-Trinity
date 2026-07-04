@@ -52,20 +52,13 @@ hl.env("QT_QPA_PLATFORMTHEME", "qt5ct") -- change to qt6ct if that's what you us
 -- each program. This is what actually launches waybar, your
 -- wallpaper daemon, notifications, idle daemon, etc. on login.
 hl.on("hyprland.start", function()
-
-	hl.exec_cmd("swaybg -i '$CURRENT_WALLPAPER' -m fill")
-	hl.exec_cmd("waybar")
+	    hl.exec_cmd("swaybg -i '$CURRENT_WALLPAPER' -m fill")
+	    hl.exec_cmd("waybar")
+        hl.exec_cmd("bash " .. HOME .. "/.local/share/Hypr-Trinity/config/hypr/configScripts/waybar-start.sh")
     	hl.exec_cmd("hypridle")
     	hl.exec_cmd("custombtoplauncher")
     	hl.exec_cmd("custombrightnessctl resetToDefault")
     	hl.exec_cmd("swaync")
-
-	-- there is some problem with waybar not starting on some systems, so this is a workaround to check if it's running and start it if not
-	local process = "waybar"
-	local fallback = "waybar &"	
-	if not os.execute("pgrep -x " .. process .. " > /dev/null 2>&1") then
-	    os.execute(fallback)
-	end	
 end)
 
 
@@ -267,6 +260,9 @@ hl.bind("XF86AudioMute", hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SINK@ to
 hl.bind("code:127", hl.dsp.exec_cmd("bash " .. HOME .. "/.local/share/Hypr-Trinity/config/hypr/configScripts/playerctl-toggle.sh"))
 hl.bind(shiftMod .. " + code:127", hl.dsp.exec_cmd("bash " .. HOME .. "/.local/share/Hypr-Trinity/config/hypr/configScripts/playerctl-previous.sh"))
 hl.bind(ctrlMod .. " + code:127", hl.dsp.exec_cmd("bash " .. HOME .. "/.local/share/Hypr-Trinity/config/hypr/configScripts/playerctl-next.sh"))
+hl.bind("code:127 + left", hl.dsp.exec_cmd("playrctl position -10"))
+hl.bind("code:127 + right", hl.dsp.exec_cmd("playrctl position +10"))
+
 -- ---- Brightness control ----
 hl.bind(ctrlMod .. " + " .. shiftMod .. " + B", hl.dsp.exec_cmd("custombrightnessctl + 5"))
 hl.bind(ctrlMod .. " + B", hl.dsp.exec_cmd("custombrightnessctl - 5"))
