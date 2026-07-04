@@ -294,9 +294,9 @@ simlinkCreate() {
 
 	log_info "GTK theme:"
 
-	mkdir -p "${HOME}/.themes"
+	mkdir -p "${HOME}/.local/share/themes"
 
-	ln -sfn "${TARGET_DIR}/theme/gtkThemes/Graphite-Dark" "${HOME}/.themes/"
+	ln -sfn "${TARGET_DIR}/theme/gtkThemes/Graphite-Dark" "${HOME}/.local/share/themes/"
 
 	log_success "Created symlink(s)"
 }
@@ -362,14 +362,13 @@ themeApply() {
 }
 
 fontInstall() {
-	log_section "Installing Font"
-	
 	local font_name="JetBrainsMono"
 	local font_dir="${TARGET_DIR}/fonts"
+	local font_path="${font_dir}/${font_name}/JetBrainsMonoNerdFont-Regular.ttf"
 
-	if fc-list | grep -qi "JetBrainsMono Nerd Font"; then
-		log_success "JetBrainsMono Nerd Font already installed, skipping."
-		return
+	if [[ -f "${font_path}" ]]; then
+    		log_success "JetBrains Mono Nerd Font already installed, skipping."
+    		return
 	fi
 
 	log_info "Downloading ${font_name} Nerd Font..."
@@ -997,7 +996,7 @@ restoreConfigs() {
 	rm -rf "${HOME}/.config/btop"
 	rm -rf "${HOME}/.config/swaync"
 	
-	rm -rf "${HOME}/.themes/Graphite-Dark"
+	rm -rf "${HOME}/.local/share/themes/Graphite-Dark"
 	
 	rm -f "${HOME}/.local/bin/custombrightnessctl"
 	rm -f "${HOME}/.local/bin/custombtoplauncher"
