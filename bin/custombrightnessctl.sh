@@ -12,9 +12,9 @@ if [ -z "$1" ]; then
     if [ -f "$CACHE_FILE" ]; then
         cat "$CACHE_FILE"
     else
-        CURRENT_VAL=$(ddcutil --bus $BUS getvcp 10 | grep -oP 'current value =\s+\K\d+')        
-        echo "$CURRENT_VAL" > "$CACHE_FILE"
-        echo "$CURRENT_VAL"
+        CURRENT_VAL=$(ddcutil --bus "${BUS}" getvcp 10 | grep -oP 'current value =\s+\K\d+')
+        echo "${CURRENT_VAL}"
+        echo "${CURRENT_VAL}" > "${CACHE_FILE}"
     fi
     exit 0
 fi
@@ -22,7 +22,7 @@ fi
 if [ -f "$CACHE_FILE" ]; then
     CURRENT_VAL=$(cat "$CACHE_FILE")
 else
-    CURRENT_VAL=$(ddcutil --bus $BUS getvcp 10 | grep -oP 'current value =\s+\K\d+')        
+    CURRENT_VAL=$(ddcutil --bus "$BUS" getvcp 10 | grep -oP 'current value =\s+\K\d+')        
 fi
 
 if ! [[ "$CURRENT_VAL" =~ ^[0-9]+$ ]]; then
@@ -30,7 +30,7 @@ if ! [[ "$CURRENT_VAL" =~ ^[0-9]+$ ]]; then
 fi
 
 if [ "$1" != "resetToDefault" ]; then
-    NEW_VAL=$(( CURRENT_VAL $1 $2 ))
+    NEW_VAL=$(( CURRENT_VAL "$1" "$2" ))
     [ "$NEW_VAL" -gt 100 ] && NEW_VAL=100
     [ "$NEW_VAL" -lt 0 ] && NEW_VAL=0
 
@@ -52,4 +52,4 @@ pkill -RTMIN+10 waybar
 
 notify-send -r 9999 -t 1500 -i "$ICON" "Brightness" "$MSG" --hint=boolean:transient:true
 
-/usr/bin/ddcutil --bus $BUS setvcp 10 "$NEW_VAL" &>/dev/null
+/usr/bin/ddcutil --bus "$BUS" setvcp 10 "$NEW_VAL" &>/dev/null

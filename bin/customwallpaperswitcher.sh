@@ -55,5 +55,5 @@ else
     echo "export CURRENT_WALLPAPER=\"${SWITCHER_WALL}\"" >> "$BASHRC"
 fi
 
-dWALL_NAME=$(basename "$SWITCHER_WALL")
+WALL_NAME=$(basename "$SWITCHER_WALL")
 notify-send -u low "Wallpaper" "$WALL_NAME" --icon="$ICON" -t 1000 --hint=boolean:transient:true

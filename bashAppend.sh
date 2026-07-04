@@ -3,9 +3,6 @@
 
 export PATH="$HOME/.local/bin:$PATH"
 
-# Point to the permanent dotfiles suite location
-export TARGET_DIR="$HOME/.local/share/Hypr-Trinity"
-
 # short hand function
 function lk {
 	cd "$(walk "$@")"
@@ -17,7 +14,7 @@ export WALK_MAIN_COLOR="#5a5b5e"
 export WALK_STATUS_BAR='[Mode(), Owner(), Size() | PadLeft(7), ModTime() | PadLeft(12)] | join(" ")'
 
 # System tools environment variables
-export CURRENT_WALLPAPER="${TARGET_DIR}/wallpaper/wall1.png"
+export CURRENT_WALLPAPER="${HOME}/.local/share/Hypr-Trinity/wallpaper/wall1.png"
 
 # Make prompt bright bold neon green keep output white.
 # PS1=' \[\033[1;32m\]\w >\[\033[0m\] ' ## neon-green
