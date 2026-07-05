@@ -15,4 +15,4 @@ ICON="$2"
 
 notify-send -u low "Web-App-Launcher" "$URL Opened" --icon="$ICON" -t 1000 --hint=boolean:transient:true
  
-hyprctl dispatch workspace 2
+hyprctl --batch "dispatch hl.dsp.focus({ workspace = 2 })"

@@ -61,7 +61,7 @@ case "$ans" in
 	[Ee]*)
 	    	echo "Exiting Hyprland session..."
 	    	sleep 0.5
-	    	hyprctl dispatch exit
+	    	hyprctl exit
 	    	;;
 	[Rr]*)
 	    	echo "Rebooting system..."

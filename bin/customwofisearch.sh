@@ -17,4 +17,4 @@ QUERY_STRING="https://google.com/search?q=$ENCODED_QUERY"
 
 zen --new-tab "$QUERY_STRING"
 
-hyprctl dispatch workspace 2
+hyprctl --batch "dispatch hl.dsp.focus({ workspace = 2 })"

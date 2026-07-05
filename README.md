@@ -308,7 +308,7 @@ Hypr-Trinity/
 │   └── swaync/                      # Notification daemon
 ├── theme/                           # Theming
 │   ├── gtkThemes/
-│   │   └── Graphite-Dark/           # GTK theme (→ ~/.themes/)
+│   │   └── Graphite-Dark/           # GTK theme (→ ~/.local/share/themes/)
 │   └── Obsidian/
 │       └── pitchBlack/              # Obsidian theme (manual install)
 ├── wallpaper/                       # Desktop wallpapers
@@ -328,7 +328,7 @@ Hypr-Trinity/
 | `config/btop/`                   | `~/.config/btop`                       | Entire folder symlinked            |
 | `config/swaync/`                 | `~/.config/swaync`                     | Entire folder symlinked            |
 | `config/alacritty/`              | `~/.config/alacritty`                  | Entire folder symlinked            |
-| `theme/gtkThemes/Graphite-Dark/` | `~/.themes/Graphite-Dark`              | Theme folder symlinked             |
+| `theme/gtkThemes/Graphite-Dark/` | `~/.local/share/themes/Graphite-Dark`  | Theme folder symlinked             |
 | `bin/custombrightnessctl.sh`     | `~/.local/bin/custombrightnessctl`     | Individual binary symlink          |
 | `bin/custombtoplauncher.sh`      | `~/.local/bin/custombtoplauncher`      | Individual binary symlink          |
 | `bin/customhyprlandexit.sh`      | `~/.local/bin/customhyprlandexit`      | Individual binary symlink          |
@@ -346,8 +346,8 @@ The **Graphite-Dark** GTK theme is bundled in this repo and applied automaticall
 ## Manual Application
 
 ```bash
-mkdir -p ~/.themes
-cp -r ./theme/gtkThemes/Graphite-Dark ~/.themes/
+mkdir -p ~/.local/share/themes
+cp -r ./theme/gtkThemes/Graphite-Dark ~/.local/share/themes/
 ```
 
 **Via command line (pick your desktop):**
