@@ -260,8 +260,8 @@ hl.bind("XF86AudioMute", hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SINK@ to
 hl.bind("code:127", hl.dsp.exec_cmd("bash " .. HOME .. "/.local/share/Hypr-Trinity/config/hypr/configScripts/playerctl-toggle.sh"))
 hl.bind(shiftMod .. " + code:127", hl.dsp.exec_cmd("bash " .. HOME .. "/.local/share/Hypr-Trinity/config/hypr/configScripts/playerctl-previous.sh"))
 hl.bind(ctrlMod .. " + code:127", hl.dsp.exec_cmd("bash " .. HOME .. "/.local/share/Hypr-Trinity/config/hypr/configScripts/playerctl-next.sh"))
-hl.bind("code:127 + left", hl.dsp.exec_cmd("playrctl position -10"))
-hl.bind("code:127 + right", hl.dsp.exec_cmd("playrctl position +10"))
+hl.bind(altMod .. "+" ..shiftMod.." + left", hl.dsp.exec_cmd("playerctl  position 10-"))
+hl.bind(altMod .. "+" ..shiftMod.." + right", hl.dsp.exec_cmd("playerctl position 10+"))
 
 -- ---- Brightness control ----
 hl.bind(ctrlMod .. " + " .. shiftMod .. " + B", hl.dsp.exec_cmd("custombrightnessctl + 5"))
