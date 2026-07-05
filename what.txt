@@ -1,5 +1,0 @@
-is it really ok like i can just do push from multiple distros and merge the working code to globle 
-
-say yes if works 
-
-answer : 

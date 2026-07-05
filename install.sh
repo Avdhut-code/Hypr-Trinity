@@ -15,6 +15,8 @@ FEDORA_MIN_UNSUPPORTED_VERSION=43
 ### after all 3 distro test ar done ill change this to ~/.${PROJECT_NAME} but the fonts and themes be only going into ~/.local/share/${PROJECT_NAME}/
 TARGET_DIR="${HOME}/.local/share/${PROJECT_NAME}"
 
+GITHUB_LINK="https://github.com/Avdhut-code/"
+
 BACKUP_CONFIG_LOCATION="${TARGET_DIR}/backupConfigs"
 
 SKIP_OPTIONAL_INSTALLS=false
@@ -72,7 +74,7 @@ EOF
 		### NEW FLAG 
 		### Add and new tag like '--reinstall' to reinstall corepackages of somthing is broken you can just invoke this to fix that which will just call me DISTROinstall functions based on distro from the bashrc var also add check for if its been running before installing the porject and it will also have a hidden tag '--purge-install' no short hand which will remove the project and reinstall it from scratch but before doing that it will take triple sudo permission from user to make sure user is aware of what he is doing and also it will create an file which will store all output of the reinstall [deletion specific]and installation also dont add this to the help menu only in readme.md and little refrence in help menu 
 		-v|--version)
-			refrenceLink "${PROJECT_NAME} by <'Avdhut-code'> is on version : ${RED} v$VERSION ${NC}" "https://github.com/Avdhut-code"
+			refrenceLink "${PROJECT_NAME} by <'Avdhut-code'> is on version : ${RED} v$VERSION ${NC}" "${GITHUB_LINK}"
 			echo ""
 			exit 0
 		;;
@@ -133,8 +135,10 @@ EOF
 			updateToolSimlink
 		fi
 	fi
+	
+	log_section "Updating/Installation Done."
 
-	printf "Just run this command now : %s source ~/.bashrc %s" "${RED}" "${NC}"
+	printf "Just run this command now : ${RED} source ~/.bashrc ${NC}"
 	
 	log_success "Installation completed successfully!"
 }

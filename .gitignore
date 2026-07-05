@@ -15,13 +15,23 @@ Thumbs.db
 /custombtoplauncher
 /customhyprlandexit
 /customlinkopenr
+/customwallpaperswitcher
 /customwofisearch
 /hyprshot
 /updateproject
-/walk
-/zen-browser
-/Hyprshot
+/obsidian
+/zen
+
+# Folders
 /apps
+/backupConfigs
+/fonts
+
+# State file 
+/.wallpaper_state
+/.current_brightness
+/.waybar-output
+
 
 # TEMP  
 change.sh
