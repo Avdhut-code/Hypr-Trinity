@@ -14,6 +14,7 @@ installPackagesDebian() {
 		playerctl \
 		wofi \
 		swaybg \
+		swaync \
 		evince \
 		xed \
 		nemo \

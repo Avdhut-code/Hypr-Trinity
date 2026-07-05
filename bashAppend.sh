@@ -5,7 +5,7 @@ export PATH="$HOME/.local/bin:$PATH"
 
 # short hand function
 function lk {
-	cd "$(walk "$@")"
+	cd $(walk "$@")
 }
 
 # env's for walk configuration/customization
