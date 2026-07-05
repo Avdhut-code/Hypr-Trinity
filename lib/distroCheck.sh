@@ -12,7 +12,7 @@ checkIfDebian() {
 	fi
 	
 	if ! grep -q "DOTFILE_SYSTEM=" "${HOME}/.bashrc"; then
-		echo 'export DOTFILE_SYSTEM="debian"' >> "${HOME}/.bashrc"
+		printf '\nexport DOTFILE_SYSTEM="debian"' >> "${HOME}/.bashrc"
 		log_success "DOTFILE_SYSTEM=debian written to .bashrc"
 	fi
 
@@ -31,7 +31,7 @@ checkIfArch() {
 	fi
 	
 	if ! grep -q "DOTFILE_SYSTEM=" "${HOME}/.bashrc"; then
-		echo 'export DOTFILE_SYSTEM="arch"' >> "${HOME}/.bashrc"
+		printf '\nexport DOTFILE_SYSTEM="arch"' >> "${HOME}/.bashrc"
 		log_success "DOTFILE_SYSTEM=arch written to .bashrc"
 	fi
 
@@ -50,7 +50,7 @@ checkIfFedora() {
 	fi
 	
 	if ! grep -q "DOTFILE_SYSTEM=" "${HOME}/.bashrc"; then
-		echo 'export DOTFILE_SYSTEM="fedora"' >> "${HOME}/.bashrc"
+		printf '\nexport DOTFILE_SYSTEM="fedora"' >> "${HOME}/.bashrc"
 		log_success "DOTFILE_SYSTEM=fedora written to .bashrc"
 	fi
 
