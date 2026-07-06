@@ -15,7 +15,7 @@ FEDORA_MIN_UNSUPPORTED_VERSION=43
 ### after all 3 distro test ar done ill change this to ~/.${PROJECT_NAME} but the fonts and themes be only going into ~/.local/share/${PROJECT_NAME}/
 TARGET_DIR="${HOME}/.local/share/${PROJECT_NAME}"
 
-GITHUB_LINK="https://github.com/Avdhut-code/"
+PROJECT_URL="https://github.com/Avdhut-code/${PROJECT_NAME}.git"
 
 BACKUP_CONFIG_LOCATION="${TARGET_DIR}/backupConfigs"
 
@@ -38,8 +38,7 @@ source "${ORIGINAL_DIR}/lib/coreInstall.sh"
 source "${ORIGINAL_DIR}/lib/optionalApps.sh"
 source "${ORIGINAL_DIR}/lib/distroInstall.sh"
 source "${ORIGINAL_DIR}/lib/maintenance.sh"
-
-# source "${TARGET_DIR}/lib/[NEWFILE].sh"
+# source "${ORIGINAL_DIR}/lib/[NEWFILE].sh"
 
 main(){
 	if [ -z "$1" ]; then
@@ -51,30 +50,36 @@ main(){
 	while [[ $# -gt 0 ]]; do
 	case "$1" in
 		-h|--help)
-			cat << 'EOF'
+		cat << EOF
 
 Usage: $0  [ --yes-optional ] [ --no-optional ] [ --restore ] [ --update ]
  	   [--debian] | [--arch] | [--fedora] [--version] [--help] 
 
-[ Distro tag ]
-  --debian	-d	Install packages for Debian-based systems (apt)
-  --arch  	-a	Install packages for Arch-based systems (pacman)
-  --fedora	-f	Install packages for Fedora-based systems (dnf)
-  
-  --yes-optional    -y	Used before 'Distro tag' to install all optional apps installations
-  --no-optional     -n	Used before 'Distro tag' to skip optional apps installations
-  --restore         -r	Remove symlinks and restore original configs
-  --update          -u	Updates the project but no backup rn
-  --version         -v	Show projects current version and exit
-  --help            -h	Show this help message and exit
-		
+[ Distro tag ] :
+
+  	--debian	-d	Install packages for Debian-based systems (apt)
+  	--arch  	-a	Install packages for Arch-based systems (pacman)
+  	--fedora	-f	Install packages for Fedora-based systems (dnf)
+	
+  	--yes-optional    -y	Used before 'Distro tag' to install all optional apps installations
+  	--no-optional     -n	Used before 'Distro tag' to skip optional apps installations
+  	--restore         -r	Remove symlinks and restore original configs
+  	--update          -u	Updates the project but no backup rn
+  	--version         -v	Show projects current version and exit
+  	--help            -h	Show this help message and exit
+
+For more information :
+
+	Visit the project at "${PROJECT_URL}" or
+	See the README.md for detailed instructions with "vim ${TARGET_DIR}/README.md"
+
 EOF
 		exit 0
 		;;
 		### NEW FLAG 
 		### Add and new tag like '--reinstall' to reinstall corepackages of somthing is broken you can just invoke this to fix that which will just call me DISTROinstall functions based on distro from the bashrc var also add check for if its been running before installing the porject and it will also have a hidden tag '--purge-install' no short hand which will remove the project and reinstall it from scratch but before doing that it will take triple sudo permission from user to make sure user is aware of what he is doing and also it will create an file which will store all output of the reinstall [deletion specific]and installation also dont add this to the help menu only in readme.md and little refrence in help menu 
 		-v|--version)
-			refrenceLink "${PROJECT_NAME} by <'Avdhut-code'> is on version : ${RED} v$VERSION ${NC}" "${GITHUB_LINK}"
+			refrenceLink "<${PROJECT_NAME}> by 'Avdhut-code' is on version : ${RED} v$VERSION ${NC}" "${PROJECT_URL}"
 			echo ""
 			exit 0
 		;;
