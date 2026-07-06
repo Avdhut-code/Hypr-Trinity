@@ -164,6 +164,7 @@ updateProject() {
 	esac
 
 	chmod +x "${TARGET_DIR}/install.sh"
-	
+
+	log_section "Updating/Installation Done."
 	log_success "Update complete — re-login to apply any config changes"
 }

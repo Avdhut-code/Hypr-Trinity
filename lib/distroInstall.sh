@@ -32,10 +32,10 @@ debianInstall(){
 	log_section "Installing Fonts"
 	fontInstall
 
+	log_section "Optional Installations"
 	if  [ "$SKIP_OPTIONAL_INSTALLS" == true ]; then
 		log_info "Optional app installations will be skipped"
 	else
-		log_section "Optional Installations"
 		optionalInstallAll
 	fi	
 }
@@ -72,11 +72,10 @@ archInstall(){
 	log_section "Installing Fonts"
 	fontInstall
 
-
+	log_section "Optional Installations"
 	if  [ "$SKIP_OPTIONAL_INSTALLS" == true ]; then
 		log_info "Optional app installations will be skipped"
 	else
-		log_section "Optional Installations"
 		optionalInstallAll
 	fi	
 }
@@ -113,11 +112,10 @@ fedoraInstall(){
 	log_section "Installing Fonts"
 	fontInstall
 
-
+	log_section "Optional Installations"
 	if  [ "$SKIP_OPTIONAL_INSTALLS" == true ]; then
 		log_info "Optional app installations will be skipped"
 	else
-		log_section "Optional Installations"
 		optionalInstallAll
 	fi
 }

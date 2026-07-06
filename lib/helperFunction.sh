@@ -7,25 +7,25 @@ BLUE='\033[1;34m'
 NC='\033[0m'
 
 log_info() {
-  	echo -e "${BLUE}[INFO]${NC} $*"
+  	printf "${BLUE}[INFO]${NC} $*"
 }
 
 log_success() {
-  	echo -e "${GREEN}[✓]${NC} $*"
+  	printf "${GREEN}[✓]${NC} $*"
 }
 
 log_warning() {
-  	echo -e "${YELLOW}[!]${NC} $*"
+  	printf "${YELLOW}[!]${NC} $*"
 }
 
 log_error() {
-  	echo -e "${RED}[✗]${NC} $*" >&2
+  	printf "${RED}[✗]${NC} $*" >&2
 }
 
 log_section() {
-  	echo -e "\n${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-  	echo -e "${BLUE}$*${NC}"
-  	echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}\n"
+  	printf "\n${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+  	printf "${BLUE}$*${NC}"
+  	printf "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}\n"
 }	
 
 exit_with_error() {

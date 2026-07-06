@@ -141,9 +141,7 @@ EOF
 		fi
 	fi
 	
-	log_section "Updating/Installation Done."
-
-	printf "Just run this command now : ${RED} source ~/.bashrc ${NC}"
+	log_success "Just run this command now : ${RED} source ~/.bashrc ${NC}\n"
 	
 	log_success "Installation completed successfully!"
 }
