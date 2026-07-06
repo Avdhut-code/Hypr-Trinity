@@ -164,7 +164,7 @@ chmod +x install.sh
 ./install.sh --restore
 
 # update after new changes
-updateproject --update
+hyprtrinity --update
 ```
 
 ## What the Installer Does
@@ -172,7 +172,7 @@ updateproject --update
 In order:
 
 1. Checks you are in the correct directory and running on the right distro
-2. Writes `DOTFILE_SYSTEM=<distro>` to `~/.bashrc` for use by `updateproject`
+2. Writes `DOTFILE_SYSTEM=<distro>` to `~/.bashrc` for use by `hyprtrinity`
 3. Installs system packages via your distro's package manager
 4. Copies the repo to `~/.local/share/Hypr-Trinity/` (permanent home)
 5. Adds current user to `i2c` group for DDC-CI brightness control
@@ -182,7 +182,7 @@ In order:
 9. Appends environment variables and PATH exports to `~/.bashrc`
 10. Applies the GTK theme via `gsettings` / `xfconf-query` based on your desktop session
 11. Optionally prompts to install: Hyprshot, Walk, Obsidian, Zen Browser, VSCode
-12. Optionally symlinks `install.sh` as `updateproject` in `~/.local/bin`
+12. Optionally symlinks `install.sh` as `hyprtrinity` in `~/.local/bin`
 
 ## After Install Checklist
 
@@ -192,7 +192,7 @@ source ~/.bashrc
 
 # 2. Verify commands are reachable
 which custombrightnessctl
-which updateproject
+which hyprtrinity
 
 # 3. Log out and back into Hyprland
 #    configs are symlinked but Hyprland needs a fresh session to pick them up
@@ -230,10 +230,10 @@ Packages installed via `dnf`:
 
 # Updating
 
-After install, the script optionally symlinks itself as `updateproject` into `~/.local/bin` — so you can update the dotfiles at any time without needing the original cloned repo.
+After install, the script optionally symlinks itself as `hyprtrinity` into `~/.local/bin` — so you can update the dotfiles at any time without needing the original cloned repo.
 
 ```bash
-updateproject --update
+hyprtrinity --update
 ```
 
 This will:
@@ -242,7 +242,7 @@ This will:
 3. Re-apply all symlinks to pick up any new config files added in the update
 
 > [!NOTE]
-> `updateproject` reads `$DOTFILE_SYSTEM` from your environment to know which distro installer to call.
+> `hyprtrinity` reads `$DOTFILE_SYSTEM` from your environment to know which distro installer to call.
 > This variable is written to `~/.bashrc` automatically during first install.
 > If the command fails with "DOTFILE_SYSTEM not set", run `source ~/.bashrc` first and try again.
 
@@ -254,8 +254,8 @@ To undo the installation — remove all symlinks and restore your original confi
 
 ```bash
 ./install.sh --restore
-# or if updateproject is set up:
-updateproject --restore
+# or if hyprtrinity is set up:
+hyprtrinity --restore
 ```
 
 This will:
@@ -314,7 +314,7 @@ Hypr-Trinity/
 ├── wallpaper/                       # Desktop wallpapers
 ├── backupConfigs/                   # Created on install — timestamped backups of original configs
 ├── bashAppend.sh                    # Appended to ~/.bashrc on install
-├── install.sh                       # Main installer (also symlinked as updateproject)
+├── install.sh                       # Main installer (also symlinked as hyprtrinity)
 └── README.md
 ```
 
@@ -335,7 +335,7 @@ Hypr-Trinity/
 | `bin/customlinkopenr.sh`         | `~/.local/bin/customlinkopenr`         | Individual binary symlink          |
 | `bin/customwofisearch.sh`        | `~/.local/bin/customwofisearch`        | Individual binary symlink          |
 | `bin/customwallpaperswitcher.sh` | `~/.local/bin/customwallpaperswitcher` | Individual binary symlink          |
-| `install.sh`                     | `~/.local/bin/updateproject`           | Optional — prompted during install |
+| `install.sh`                     | `~/.local/bin/hyprtrinity`           | Optional — prompted during install |
 
 ---
 
