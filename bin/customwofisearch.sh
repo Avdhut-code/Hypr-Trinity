@@ -7,7 +7,7 @@ USER_INPUT=$(
 )
 
 if [ -z "$USER_INPUT" ]; then
-  	hyprctl notify 3 3000 "fontsize:35 No input provided."
+	hyprctl eval 'hl.notification.create({ text = "No input provided.", timeout = 3000, font_size = 35, icon = 3 })'
   	exit 1
 fi
 
