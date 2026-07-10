@@ -148,11 +148,13 @@ chmod +x install.sh
 | `--update` | `-u` | Pull latest changes and re-apply symlinks |
 | `--yes-optional` | `-y` | Automaticaly installs optional app no [y/n] |
 | `--no-optional` | `-n` | Skip optional app installs |
+| `--themes` | `-t` | Install a supported app theme — `--vscode` or `--obsidian` |
 | `--debian` | `-d` | Install for Debian / Ubuntu / Linux Mint (apt) |
 | `--arch` | `-a` | Install for Arch (pacman + yay) |
 | `--fedora` | `-f` | Install for Fedora (dnf + COPR) |
 
 **Examples:**
+
 ```bash
 # install on Arch, skip optional apps
 ./install.sh --no-optional --arch 
@@ -530,6 +532,20 @@ rm /tmp/obsidian.deb
 
 ## Applying the Bundled Pitch Black Theme
 
+The installer can set this up for you automatically:
+
+```bash
+./install.sh --theme --obsidian
+```
+
+You'll be prompted for the path to your Obsidian vault. The script checks that the path is a valid vault (looks for a `.obsidian` folder), then symlinks the bundled theme in and configures `appearance.json` to use it automatically — no manual step needed inside Obsidian afterward.
+
+This also runs automatically after Obsidian itself is installed via the optional-apps flow.
+
+### Manual Installation
+
+If you'd rather do it by hand:
+
 ```bash
 # replace YourVault with your actual vault folder name
 mkdir -p ~/YourVault/.obsidian/themes/
@@ -640,6 +656,13 @@ code --install-extension viktorqvarfordt.vscode-pitch-black-theme
 
 ## Applying the Pitch Black Theme
 
+Installed automatically alongside VSCode, or on its own via:
+
+```bash
+./install.sh --theme --vscode
+```
+
+Or manually:
 ```
 Ctrl + Shift + P → Color Theme → Pitch Black
 ```
