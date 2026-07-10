@@ -101,7 +101,7 @@ simlinkCreate() {
 
 	mkdir -p "${HOME}/.local/share/themes"
 
-	ln -sfn "${TARGET_DIR}/theme/gtkThemes/Graphite-Dark" "${HOME}/.local/share/themes/"
+	ln -sfn "${TARGET_DIR}/themes/gtkThemes/Graphite-Dark" "${HOME}/.local/share/themes/"
 
 	log_success "Created symlink(s)"
 }
@@ -122,47 +122,6 @@ bashAppend() {
 	else
 		log_warning "bashAppend.sh not found, skipping .bashrc modification"
 	fi
-}
-
-themeApply() {
-	log_info "Applying GTK theme..."
-	
-	local theme="Graphite-Dark"
-	local desktop="${XDG_CURRENT_DESKTOP:-}"
-
-	if [ -z "$desktop" ]; then
-		desktop="${DESKTOP_SESSION:-}"
-	fi
-
-	log_info "Detected desktop: ${desktop:-unknown}"
-
-	case "${desktop,,}" in  
-		*xfce*)
-			xfconf-query -c xsettings -p /Net/ThemeName -s "$theme" 2>/dev/null \
-				&& log_success "XFCE theme set" \
-				|| log_warning "xfconf-query failed — install xfce4-settings"
-		;;
-		*cinnamon*)
-			gsettings set org.cinnamon.desktop.interface gtk-theme "$theme" 2>/dev/null \
-				&& log_success "Cinnamon theme set" \
-				|| log_warning "Could not set Cinnamon theme"
-		;;
-		*gnome*)
-			gsettings set org.gnome.desktop.interface gtk-theme "$theme" 2>/dev/null \
-				&& log_success "GNOME theme set" \
-				|| log_warning "Could not set GNOME theme"
-		;;
-		*hyprland*|*sway*|*wlroots*)
-			gsettings set org.gnome.desktop.interface gtk-theme "$theme" 2>/dev/null \
-				&& log_success "Wayland session theme set" \
-				|| log_warning "Could not set theme"
-		;;
-		*)
-			log_warning "Unknown desktop: '${desktop}' — trying gsettings anyway"
-			gsettings set org.gnome.desktop.interface gtk-theme "$theme" 2>/dev/null \
-				|| log_warning "Theme could not be applied, set it manually"
-		;;
-	esac
 }
 
 fontInstall() {

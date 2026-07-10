@@ -260,12 +260,15 @@ obsidianInstall() {
 	if [ "$AUTOMATIC_OPTIONAL_INSATALL" == true ]; then 		
 		if [ "$IS_DEBIAN" == true ]; then
 			innerObsidianInstall "debian"
+			obsidianThemeInstall
 		fi
 		if [ "$IS_ARCH" == true ]; then
-		        command -v yay &>/dev/null && yay -S --noconfirm obsidian || innerObsidianInstall
+		        command -v yay &>/dev/null && yay -S --noconfirm obsidian || innerObsidianInstall 
+			obsidianThemeInstall
 		fi
 		if [ "$IS_FEDORA" == true ]; then
 			innerObsidianInstall "fedora"
+			obsidianThemeInstall
 		fi	
 		
 		return	
@@ -280,13 +283,15 @@ obsidianInstall() {
 	case "$obsidianChoice" in
 	1)	
 		if [ "$IS_DEBIAN" == true ]; then
-			innerObsidianInstall "debian" 
+			innerObsidianInstall "debian" 	
+			obsidianThemeInstall
 		fi
 
 		if [ "$IS_ARCH" == true ]; then
 			if command -v yay &>/dev/null; then	
 				log_info "Downloading obsidian"
 				yay -S --noconfirm obsidian
+				obsidianThemeInstall
 			else
 				log_warning "yay not found — install obsidian from AUR manually"
 			fi
@@ -294,6 +299,7 @@ obsidianInstall() {
 
 		if [ "$IS_FEDORA" == true ]; then
 			innerObsidianInstall "fedora" 
+			obsidianThemeInstall
 		fi
 
 		log_success "Obsidian installed"
@@ -318,27 +324,6 @@ obsidianInstall() {
 		log_info "Obsidian installation skipped"
 	;;
 	esac
-}
-
-vscodeThemeInstall(){
-	local settings="${HOME}/.config/Code/User/settings.json"
-
-	if command -v code &>/dev/null; then
-		log_info "Now installing vscode theme"
-		
-		mkdir -p "${HOME}/.vscode/extensions"
-
-		code --install-extension 'viktorqvarfordt.vscode-pitch-black-theme' 2>/dev/null && log_success "VSCode Pitch Black theme installed" || log_warning "Failed to install VSCode Pitch Black theme"	
-
-		mkdir -p "$(dirname "$settings")"
-
-		if [ -f "$settings" ]; then
-			sed -i 's/"workbench.colorTheme": ".*"/"workbench.colorTheme": "Pitch Black"/' "$settings"
-		else
-			echo '{ "workbench.colorTheme": "Pitch Black" }' >>"$settings"
-			echo '{ "editor.fontFamily": "JetBrainsMono Nerd Font" }' >> "$settings"
-		fi		
-	fi
 }
 
 innerVscodeInstall(){

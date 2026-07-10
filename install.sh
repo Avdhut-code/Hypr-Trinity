@@ -35,6 +35,7 @@ source "${ORIGINAL_DIR}/lib/helperFunction.sh"
 source "${ORIGINAL_DIR}/lib/distroCheck.sh"
 source "${ORIGINAL_DIR}/lib/distroPackages.sh"
 source "${ORIGINAL_DIR}/lib/coreInstall.sh"
+source "${ORIGINAL_DIR}/lib/themeFunction.sh"
 source "${ORIGINAL_DIR}/lib/optionalApps.sh"
 source "${ORIGINAL_DIR}/lib/distroInstall.sh"
 source "${ORIGINAL_DIR}/lib/maintenance.sh"
@@ -53,6 +54,7 @@ main(){
 		cat << EOF
 
 Usage: $0  [ --yes-optional ] [ --no-optional ] [ --restore ] [ --update ]
+	   [ --theme (--vscode | --obsidian) ]
  	   [--debian] | [--arch] | [--fedora] [--version] [--help] 
 
 [ Distro tag ] :
@@ -64,8 +66,12 @@ Usage: $0  [ --yes-optional ] [ --no-optional ] [ --restore ] [ --update ]
   	--yes-optional    -y	Used before 'Distro tag' to install all optional apps installations
   	--no-optional     -n	Used before 'Distro tag' to skip optional apps installations
   	--restore         -r	Remove symlinks and restore original configs
-  	--update          -u	Updates the project but no backup rn
-  	--version         -v	Show projects current version and exit
+  	--update          -u	Updates the project but no backup rn	
+	--theme           -t	Install a supported application theme. 	
+				1. --vscode	Install the VS Code theme.
+			 	2. --obsidian	Install the Obsidian theme.
+	
+	--version         -v	Show projects current version and exit
   	--help            -h	Show this help message and exit
 
 For more information :
@@ -76,8 +82,6 @@ For more information :
 EOF
 		exit 0
 		;;
-		### NEW FLAG 
-		### Add and new tag like '--reinstall' to reinstall corepackages of somthing is broken you can just invoke this to fix that which will just call me DISTROinstall functions based on distro from the bashrc var also add check for if its been running before installing the porject and it will also have a hidden tag '--purge-install' no short hand which will remove the project and reinstall it from scratch but before doing that it will take triple sudo permission from user to make sure user is aware of what he is doing and also it will create an file which will store all output of the reinstall [deletion specific]and installation also dont add this to the help menu only in readme.md and little refrence in help menu 
 		-v|--version)
 			refrenceLink "<${PROJECT_NAME}> by 'Avdhut-code' is on version : ${RED} v$VERSION ${NC}" "${PROJECT_URL}"
 			echo ""
@@ -99,6 +103,37 @@ EOF
 			restoreConfigs
 			shift
 		;;
+		-t|--theme)
+			shift						    
+			[[ $# -eq 0 ]] && {
+    			    	log_error "--theme requires an argument. Check the --help for usage."
+    			    	exit 1
+    			}
+
+			case "$1" in
+				--vscode)
+					vscodeThemeInstall
+					;;
+				--obsidian)
+					obsidianThemeInstall
+					;;
+				*)
+					log_error "Unknown theme option: $1"
+					exit 1
+					;;
+			esac
+			shift
+		;;
+		-ri|--reinstall)
+			echo "rn it does nothing but will be used to reinstall core packages if something is broken"
+			exit 0
+
+			reInstallProject
+			### NEW FLAG 
+			### Add and new tag like '--reinstall' to reinstall corepackages of somthing is broken you can just invoke this to fix that which will just call me DISTROinstall functions based on distro from the bashrc var also add check for if its been running before installing the porject and it will also have a hidden tag '--purge-install' no short hand which will remove the project and reinstall it from scratch but before doing that it will take triple sudo permission from user to make sure user is aware of what he is doing and also it will create an file which will store all output of the reinstall [deletion specific]and installation also dont add this to the help menu only in readme.md and little refrence in help menu 
+			shift
+		;;
+		
 		-d|--debian)
 			IS_DEBIAN=true
 			IS_INSTALL=true

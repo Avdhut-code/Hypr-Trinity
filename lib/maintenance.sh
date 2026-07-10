@@ -168,3 +168,12 @@ updateProject() {
 	log_section "Updating/Installation Done."
 	log_success "Update complete — re-login to apply any config changes"
 }
+
+# # WILL DO THIS LATER RN IN HURRY
+
+# reInstallProject() {
+# 	log_section "Re-installing whole Project"
+	
+	
+# 	# WORK IN PROGRESS RN WILL DO THIS LATER
+# }
