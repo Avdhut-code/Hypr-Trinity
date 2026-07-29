@@ -53,4 +53,10 @@ alias ~="cd ~"
 
 alias ..="cd .."
 
+# === HYPR-TRINITY AUTOCOMPLETE ===
+
+if [ -f "${HOME}/.local/share/Hypr-Trinity/completions/hyprtrinity.bash" ]; then
+    source "${HOME}/.local/share/Hypr-Trinity/completions/hyprtrinity.bash"
+fi
+
 # === HYPRLAND CONFIG END ===

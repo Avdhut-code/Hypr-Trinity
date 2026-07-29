@@ -56,14 +56,17 @@ hyprshotInstall() {
 	;;
 	2)
       	echo """
-		Manual Hyprshot Installation:
-			1. git clone https://github.com/Gustash/hyprshot.git ~/Hyprshot
 
-			2. chmod +x ~/Hyprshot/hyprshot
-			
-			3. mkdir -p ~/.local/bin && ln -s ~/Hyprshot/hyprshot ~/.local/bin/hyprshot
-			
-			4. hyprshot --help 
+	Manual Hyprshot Installation:
+	
+		1. git clone https://github.com/Gustash/hyprshot.git ~/Hyprshot
+
+		2. chmod +x ~/Hyprshot/hyprshot
+		
+		3. mkdir -p ~/.local/bin && ln -s ~/Hyprshot/hyprshot ~/.local/bin/hyprshot
+		
+		4. hyprshot --help 
+
 	"""
       	;;
     	3|*)
@@ -109,12 +112,15 @@ walkInstall() {
 	;;
 	2)
       	echo """
-		Manual Walk Installation:
-			1. git clone https://github.com/antonmedv/walk.git ~/walk
 
-			2. chmod +x ~/walk/install.sh
-			
-			3. bash ~/walk/install.sh
+	Manual Walk Installation:
+		
+		1. git clone https://github.com/antonmedv/walk.git ~/walk
+
+		2. chmod +x ~/walk/install.sh
+		
+		3. bash ~/walk/install.sh
+
 	"""
 	;;
 	3|*)
@@ -190,17 +196,20 @@ zenInstall() {
 	;;
 	2)
 	echo """
-		Manual Zen Browser Installation:
-			1. Download:
-			"curl -L https://github.com/zen-browser/desktop/releases/latest/download/zen.linux-x86_64.tar.xz -o /tmp/zen.tar.xz"
 
-			2. Extract:
-			"mkdir -p ~/.local/share/zen-browser"
-			"tar -xf /tmp/zen.tar.xz -C ~/.local/share/zen-browser --strip-components=1"
+	Manual Zen Browser Installation:
 
-			3. Symlink the binary "ln -sfn ~/.local/share/zen-browser/zen ~/.local/bin/zen"
+		1. Download:
+		"curl -L https://github.com/zen-browser/desktop/releases/latest/download/zen.linux-x86_64.tar.xz -o /tmp/zen.tar.xz"
 
-			4. Verify by running "zen --version"
+		2. Extract:
+		"mkdir -p ~/.local/share/zen-browser"
+		"tar -xf /tmp/zen.tar.xz -C ~/.local/share/zen-browser --strip-components=1"
+
+		3. Symlink the binary "ln -sfn ~/.local/share/zen-browser/zen ~/.local/bin/zen"
+
+		4. Verify by running "zen --version"
+
 	"""
 	;;
 	3|*)
@@ -306,18 +315,21 @@ obsidianInstall() {
 	;;
 	2)
 	echo """
-		Manual Obsidian Installation:
-			1. got to https://obsidian.md/download
+	
+	Manual Obsidian Installation:
 
-			2. download the appropriate package for you system
-			
-			3. got to the download directory and run "sudo apt install ./obsidian_*.deb"
-			
-			4. install it with "sudo apt install ./path/to/obsidian_*.deb"
-			
-			5. remove the .deb file after installation with "rm ./path/to/obsidian_*.deb"
-			
-			6. Now you can add the obsidian dark theme to your "VaultName/.obsidian/themes/"
+		1. got to https://obsidian.md/download
+
+		2. download the appropriate package for you system
+		
+		3. got to the download directory and run "sudo apt install ./obsidian_*.deb"
+		
+		4. install it with "sudo apt install ./path/to/obsidian_*.deb"
+		
+		5. remove the .deb file after installation with "rm ./path/to/obsidian_*.deb"
+		
+		6. Now you can add the obsidian dark theme to your "VaultName/.obsidian/themes/"
+
 	"""
 	;;
 	3|*)
@@ -399,16 +411,25 @@ vscodeInstall() {
 	;;
 	2)
 	echo """
-		Manual VSCode Installation:
-			1. Go to https://code.visualstudio.com/Download
-			2. Download the .deb package (x64)
-			3. Install it:
+	
+	Manual VSCode Installation:
+
+		1. Go to https://code.visualstudio.com/Download
+
+		2. Download the .deb package (x64)
+
+		3. Install it:
+
 			sudo apt install -y ~/Downloads/code_*.deb
 
-			Or via curl:
+		Or via curl:
+
 			1. curl -L "https://code.visualstudio.com/sha/download?build=stable&os=linux-deb-x64" -o /tmp/vscode.deb
+
 			2. sudo apt install -y /tmp/vscode.deb
+
 			3. code --version
+
 	"""
 	;;
 	3|*)

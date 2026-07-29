@@ -77,7 +77,7 @@ obsidianThemeInstall(){
         fi
 
         local obsidian_theme_dir="${obsidian_dir}/.obsidian/themes"
-        local obsidian_appearance_file="${obsidian_theme_dir}/appearance.json"
+        local obsidian_appearance_file="${obsidian_dir}/.obsidian/appearance.json"
         
         if [ -d "${obsidian_dir}" ]; then
                 log_info "Installing Obsidian theme..."

@@ -2,18 +2,19 @@
 
 installProceed(){
 	cat << 'EOF'
-This script will:
-	• Check what distrobution you installing this onto
-	• Install system packages (requires sudo)
-	• Relocate suite to ~/.local/share/${PROJECT_NAME}
-	• Create symlinks in ~/.local/bin (user-local, no sudo)
-	• Moves the original Config folders to 'backupFolder' (folder from previous setup)
-	• Create symlinks in ~/.config (user-local, no sudo)
-	• Append to .bashrc with safe environment variables
-	• Apply GTK theme with gesttings based on your desktop enviourment
-	• Ask you to permission to install based on your desktop enviourment
-	  - [ If you used the '--no-optional' tag, will skip over the permission ]
-	
+
+	This script will:
+		• Check what distrobution you installing this onto
+		• Install system packages (requires sudo)
+		• Relocate suite to ~/.local/share/${PROJECT_NAME}
+		• Create symlinks in ~/.local/bin (user-local, no sudo)
+		• Moves the original Config folders to 'backupFolder' (folder from previous setup)
+		• Create symlinks in ~/.config (user-local, no sudo)
+		• Append to .bashrc with safe environment variables
+		• Apply GTK theme with gesttings based on your desktop enviourment
+		• Ask you to permission to install based on your desktop enviourment
+		  - [ If you used the '--no-optional' tag, will skip over the permission ]
+
 EOF
 	read -p "Continue with installation? (y/n) [n]: " -r continue_install
 	continue_install=${continue_install:-n}
@@ -24,8 +25,8 @@ EOF
 	fi
 }
 
-updateToolSimlink(){
-	if [ ! -f "${TARGET_DIR}/install.sh" ]; then
+updateToolSimlink() {
+ 	if [ ! -f "${TARGET_DIR}/install.sh" ]; then
 		log_error "${TARGET_DIR}/install.sh not found"
 		exit 1
 	fi
@@ -37,6 +38,31 @@ updateToolSimlink(){
 		chmod +x "${TARGET_DIR}/install.sh"
 		
 		log_success "hyprtrinity symlinked to ~/.local/bin"
+	fi   
+
+	tagAutoComplete
+
+}
+
+tagAutoComplete() {
+    	local bashrc="${HOME}/.bashrc"
+	
+    	if [ -f "${bashrc}" ]; then
+        	if ! grep -q "# === HYPR-TRINITY AUTOCOMPLETE ===" "${bashrc}"; then
+			echo """
+
+			# === HYPR-TRINITY AUTOCOMPLETE ===
+
+			if [ -f "${TARGET_DIR}/completions/hyprtrinity.bash" ]; then
+    				source "${TARGET_DIR}/completions/hyprtrinity.bash"
+			fi
+
+            		""" >> "${bashrc}"
+
+    	    		log_success "Tab completion installed successfully!"
+		else
+			log_error "Completion file not found in ${TARGET_DIR}/completions/"
+		fi
 	fi
 }
 

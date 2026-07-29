@@ -141,17 +141,17 @@ chmod +x install.sh
 
 ## Install Script Flags
 
-| Flag | Short | Description |
-|---|---|---|
-| `--help` | `-h` | Show usage and exit |
-| `--restore` | `-r` | Remove symlinks and restore backed up configs |
-| `--update` | `-u` | Pull latest changes and re-apply symlinks |
-| `--yes-optional` | `-y` | Automaticaly installs optional app no [y/n] |
-| `--no-optional` | `-n` | Skip optional app installs |
-| `--themes` | `-t` | Install a supported app theme — `--vscode` or `--obsidian` |
-| `--debian` | `-d` | Install for Debian / Ubuntu / Linux Mint (apt) |
-| `--arch` | `-a` | Install for Arch (pacman + yay) |
-| `--fedora` | `-f` | Install for Fedora (dnf + COPR) |
+| Flag             | Short | Description                                                |
+| ---------------- | ----- | ---------------------------------------------------------- |
+| `--help`         | `-h`  | Show usage and exit                                        |
+| `--restore`      | `-r`  | Remove symlinks and restore backed up configs              |
+| `--update`       | `-u`  | Pull latest changes and re-apply symlinks                  |
+| `--yes-optional` | `-y`  | Automaticaly installs optional app no [y/n]                |
+| `--no-optional`  | `-n`  | Skip optional app installs                                 |
+| `--themes`       | `-t`  | Install a supported app theme — `--vscode` or `--obsidian` |
+| `--debian`       | `-d`  | Install for Debian / Ubuntu / Linux Mint (apt)             |
+| `--arch`         | `-a`  | Install for Arch (pacman + yay)                            |
+| `--fedora`       | `-f`  | Install for Fedora (dnf + COPR)                            |
 
 **Examples:**
 
