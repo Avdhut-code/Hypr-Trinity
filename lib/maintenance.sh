@@ -146,7 +146,7 @@ updateProject() {
 	log_info "Detected install distro: $system"
 	log_info "Pulling latest changes (auto-stashing local edits)..."
 	
-	git -C "$TARGET_DIR" pull --autostash
+	git -C "$TARGET_DIR" pull --autostash --rebase
 	
 	if ! git -C "$TARGET_DIR" --no-pager diff --check; then
 	    	log_warning "Merge conflicts detected after update — reverting to pre-pull state"
