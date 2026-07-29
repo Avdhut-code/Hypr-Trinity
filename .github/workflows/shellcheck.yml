@@ -1,0 +1,44 @@
+name: Shell Lint & Cleanup
+
+# Trigger the workflow on pushes and pull requests to the main branch
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  lint-and-check:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Check out the code from your repository
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Step 2: Check for trailing whitespace and count errors
+      - name: Check for trailing whitespace
+        run: |
+          echo "Checking for trailing whitespace in files..."
+          
+          # Find trailing whitespace in shell scripts (.sh files)
+          # Grep returns line matches; we count them using wc -l
+          SPACE_ERRORS=$(grep -rI-[[:blank:]]$ --include="*.sh" . | wc -l || true)
+          
+          if [ "$SPACE_ERRORS" -gt 0 ]; then
+            echo "::error:: Found $SPACE_ERRORS line(s) with trailing whitespace!"
+            grep -rnI-[[:blank:]]$ --include="*.sh" .
+            exit 1
+          else
+            echo "No trailing whitespace found."
+          fi
+
+      # Step 3: Run ShellCheck and count errors
+      - name: Run ShellCheck
+        uses: ludeeus/action-shellcheck@master
+        with:
+          # Automatically scans all .sh files in your repo
+          scandir: '.'
+        env:
+          # Optional: ShellCheck exit code settings
+          SHELLCHECK_OPTS: -severity=style
