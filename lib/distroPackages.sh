@@ -46,6 +46,8 @@ installPackagesArch() {
 		uwsm \
 		rsync \
 		alacritty
+
+		yayInstall
 }
 
 installPackagesFedora() {

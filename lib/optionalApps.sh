@@ -1,6 +1,8 @@
 #!/bin/bash
 
 yayInstall() {
+	log_section "Installing yay (AUR helper)"
+
 	if command -v yay &>/dev/null; then
 		log_success "yay already installed"
 		return
@@ -45,9 +47,10 @@ hyprshotInstall() {
 		return
 	fi
 
-	echo "  [1] Auto install from GitHub"
-	echo "  [2] Manual install (show instructions)"
-	echo "  [3] Skip"
+	echo "[1] Auto install from GitHub"
+	echo "[2] Manual install (show instructions)"
+	echo "[3] Skip"
+	echo " "	
 	read -rp "Select option [1/2/3]: " choice
 
 	case "$choice" in
@@ -101,11 +104,12 @@ walkInstall() {
 		return
 	fi
 
-	echo "  [1] Auto install from GitHub"
-	echo "  [2] Manual install (show instructions)"
-	echo "  [3] Skip"
-	read -rp "Select option [1/2/3]: " walkChoice
-	
+	echo "[1] Auto install from GitHub"
+	echo "[2] Manual install (show instructions)"
+	echo "[3] Skip"
+	echo " "
+	read -rp "Select option [1/2/3]: " walkChoice	
+
 	case "$walkChoice" in
 	1)
 		innerWalkInstall
@@ -169,9 +173,10 @@ zenInstall() {
 		return	
 	fi
 
-	echo "  [1] Auto install from GitHub"
-	echo "  [2] Manual install (show instructions)"
-	echo "  [3] Skip"
+	echo "[1] Auto install from GitHub"
+	echo "[2] Manual install (show instructions)"
+	echo "[3] Skip"
+	echo " "
 	read -rp "Select option [1/2/3]: " choice
 	
 	case "$choice" in
@@ -231,6 +236,16 @@ innerObsidianInstall(){
 			curl -L "$pkg_url" -o "$pkg_path" 
 			sudo apt install -y "$pkg_path" 
 			rm "$pkg_path"
+		;;	
+		arch)
+			local pkg_url="https://github.com/obsidianmd/obsidian-releases/releases/download/v${version}/obsidian-${version}.tar.gz"
+			local pkg_path="${TARGET_DIR}/apps/obsidian_${version}.tar.gz"
+			log_info "Downloading obsidian"
+			mkdir -p "${TARGET_DIR}/apps"
+			curl -L "$pkg_url" -o "$pkg_path"
+			tar -xvf "$pkg_path" -C "${TARGET_DIR}/apps"
+			ln -sfn "${TARGET_DIR}/apps/Obsidian-${version}/obsidian" "$HOME/.local/bin/obsidian"
+			rm "$pkg_path"
 		;;
 		fedora)
 			local pkg_url="https://github.com/obsidianmd/obsidian-releases/releases/download/v${version}/Obsidian-${version}.AppImage"
@@ -272,7 +287,7 @@ obsidianInstall() {
 			obsidianThemeInstall
 		fi
 		if [ "$IS_ARCH" == true ]; then
-		        command -v yay &>/dev/null && yay -S --noconfirm obsidian || innerObsidianInstall 
+		        command -v yay &>/dev/null && yay -S --noconfirm obsidian || innerObsidianInstall "arch"
 			obsidianThemeInstall
 		fi
 		if [ "$IS_FEDORA" == true ]; then
@@ -283,9 +298,10 @@ obsidianInstall() {
 		return	
 	fi
 
-	echo "  [1] Auto install from GitHub"
-	echo "  [2] Manual install (show instructions)"
-	echo "  [3] Skip"
+	echo "[1] Auto install from GitHub"
+	echo "[2] Manual install (show instructions)"
+	echo "[3] Skip"
+	echo " "
 	read -rp "Select option [1/2/3]: " obsidianChoice
 	
 	
@@ -345,9 +361,18 @@ innerVscodeInstall(){
 			local pkg_url="https://code.visualstudio.com/sha/download?build=stable&os=linux-deb-x64"
 			local pkg_path="/tmp/vscode.deb"
 			curl -L "$pkg_url" -o "$pkg_path" 
+			mkdir -p "${TARGET_DIR}/apps"
 			sudo apt install -y "$pkg_path" 
 			rm "$pkg_path"
 			vscodeThemeInstall	
+		;;
+		arch)
+		    	local pkg_url="https://update.code.visualstudio.com/latest/linux-x64/stable"
+		    	local pkg_path="${TARGET_DIR}/apps/vscode.tar.gz"
+		    	curl -L "$pkg_url" -o "$pkg_path"
+		    	tar -xvf "$pkg_path" -C "${TARGET_DIR}/apps"
+		    	ln -sfn "${TARGET_DIR}/apps/VSCode-linux-x64/code" "$HOME/.local/bin/code"
+			rm "$pkg_path"
 		;;
 		fedora)
 			local pkg_url="https://code.visualstudio.com/sha/download?build=stable&os=linux-rpm-x64"
@@ -385,9 +410,10 @@ vscodeInstall() {
 		return	
 	fi
 
-	echo "  [1] Auto install from GitHub"
-	echo "  [2] Manual install (show instructions)"
-	echo "  [3] Skip"
+	echo "[1] Auto install from GitHub"
+	echo "[2] Manual install (show instructions)"
+	echo "[3] Skip"
+	echo " "
 	read -rp "Select option [1/2/3]: " vscodeChoice
 
 	case "$vscodeChoice" in
@@ -402,6 +428,8 @@ vscodeInstall() {
 				yay -S --noconfirm visual-studio-code-bin
 			else
 				log_warning "yay not found — install VSCode from AUR manually"
+				log_info "Fallback to curl manual install"
+				innerVscodeInstall "arch"
 			fi
 		fi
 

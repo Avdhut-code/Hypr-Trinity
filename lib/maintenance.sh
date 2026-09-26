@@ -60,8 +60,6 @@ tagAutoComplete() {
             		""" >> "${bashrc}"
 
     	    		log_success "Tab completion installed successfully!"
-		else
-			log_error "Completion file not found in ${TARGET_DIR}/completions/"
 		fi
 	fi
 }
