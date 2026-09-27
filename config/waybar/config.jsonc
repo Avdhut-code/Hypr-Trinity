@@ -126,7 +126,7 @@
 	"custom/brightness": {
 		"exec": "custombrightnessctl",
 		"return-type": "",
-		"format": "󰃠 {}%",
+		"format": "󰃠  {}%",
 		"interval": "once",
 		"on-click": "custombrightnessctl resetToDefault",
 		"signal": 10

@@ -29,7 +29,7 @@ installPackagesDebian() {
 
 installPackagesArch() {
     	sudo pacman -Syu --noconfirm
-   	sudo pacman -S --noconfirm --needed \
+   	sudo pacman -S --noconfirm --needed base-devel \
         	git ddcutil btop htop libnotify pavucontrol \
         	wireplumber playerctl wofi swaybg \
         	evince gedit nemo mpv curl \

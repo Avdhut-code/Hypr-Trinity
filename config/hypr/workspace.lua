@@ -17,7 +17,7 @@ hl.window_rule({
 
 hl.window_rule({
     name  = "ws3-code",
-    match = { class = "^(code)$" },
+    match = { class = "^(com.microsoft.VSCode)$" },
     workspace = "3",
 })
 
