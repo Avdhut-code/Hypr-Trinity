@@ -178,7 +178,7 @@ EOF
 	
 	log_success "Just run this command now : ${RED} source ~/.bashrc ${NC}\n"
 	
-	log_success "Installation completed successfully!"
+	# log_success "Installation completed successfully!"
 }
 
 main "$@"

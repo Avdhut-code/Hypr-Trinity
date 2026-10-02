@@ -155,8 +155,6 @@ fontInstall() {
 }
 
 themeInstall() {
-    log_section "Installing Graphite GTK Theme"
-
     local url="https://github.com/vinceliuice/Graphite-gtk-theme.git"
     local tmp_path="/tmp/Graphite"
     local target_theme_dir="${HOME}/.local/share/themes"
@@ -174,9 +172,11 @@ themeInstall() {
 
         	chmod +x "${tmp_path}/install.sh"
 
-        	log_info "Building theme..."
+        	log_info "Building theme... begin"
 
         	"${tmp_path}/install.sh" -d "${TARGET_DIR}/themes/" -t default -c dark -s compact --tweaks black --round 6px
+
+        	log_info "Building theme... end"
 
         	log_info "Symlinking to ~/.local/share/themes..."
         	mkdir -p "${target_theme_dir}"
