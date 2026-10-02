@@ -26,6 +26,9 @@ debianInstall(){
 		bashAppend
 	fi 
 
+	log_section "Download GTK Theme"
+	themeInstall
+
 	log_section "Applying GTK Theme"
 	themeApply
 
@@ -65,6 +68,9 @@ archInstall(){
 		bashAppend
 	fi  
 
+	log_section "Download GTK Theme"
+	themeInstall
+
 	log_section "Applying GTK Theme"
 	themeApply
 
@@ -103,6 +109,9 @@ fedoraInstall(){
 		log_section "Configuring .bashrc"
 		bashAppend
 	fi 
+
+	log_section "Download GTK Theme"
+	themeInstall
 
 	log_section "Applying GTK Theme"
 	themeApply

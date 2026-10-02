@@ -3,7 +3,7 @@
 themeApply() {
 	log_info "Applying GTK theme..."
 	
-	local theme="Graphite-Dark"
+	local theme="Graphite-Dark-compact"
 	local desktop="${XDG_CURRENT_DESKTOP:-}"
 
 	if [ -z "$desktop" ]; then

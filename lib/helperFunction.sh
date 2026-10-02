@@ -6,30 +6,57 @@ YELLOW='\033[1;33m'
 BLUE='\033[1;34m'
 NC='\033[0m'
 
+# log_info() {
+#   	echo -e "${BLUE}[INFO]${NC} $*"
+# }
+
+# log_success() {
+#   	echo -e "${GREEN}[✓]${NC} $*"
+# }
+
+# log_warning() {
+#   	echo -e "${YELLOW}[!]${NC} $*"
+# }
+
+# log_error() {
+#   	echo -e "${RED}[✗]${NC} $*" >&2
+# }
+
+# log_section() {
+#   	echo -e "\n${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+#   	echo -e "${BLUE}$*${NC}"
+#   	echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}\n"
+# }	
+
+# exit_with_error() {
+#   	log_error "$1"
+#   	exit 1
+# }
+
 log_info() {
-  	echo -e "${BLUE}[INFO]${NC} $*"
+  	 echo -e "${BLUE}[ INFO ]${NC} $*"
 }
 
 log_success() {
-  	echo -e "${GREEN}[✓]${NC} $*"
+  	echo -e "${GREEN}[  OK  ]${NC} $*"
 }
 
 log_warning() {
-  	echo -e "${YELLOW}[!]${NC} $*"
+  	echo -e "${YELLOW}[ WARNING ]${NC} $*"
 }
 
 log_error() {
-  	echo -e "${RED}[✗]${NC} $*" >&2
+  	echo -e "${RED}[ ERROR ]${NC} $*" >&2
 }
 
 log_section() {
-  	echo -e "\n${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-  	echo -e "${BLUE}$*${NC}"
-  	echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}\n"
+	echo   " "
+  	echo -e "\n${BLUE}|━━━━━━━━━━━━━━━━━━━| ${*} |━━━━━━━━━━━━━━━━━━━━━━━━━━━━|${NC}"
+	echo   " "
 }	
 
 exit_with_error() {
-  	log_error "$1"
+  	echo -e "${RED}[ ERROR_EXIT ]${NC} $*" >&2
   	exit 1
 }
 

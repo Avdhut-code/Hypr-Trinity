@@ -20,7 +20,7 @@ local altMod   = "ALT"
 local ctrlMod  = "CTRL"
 
 local HOME = os.getenv("HOME")
-
+local BIN = HOME .. "/.local/bin/"
 
 ------------------
 ---- MONITORS ----
@@ -56,8 +56,8 @@ hl.on("hyprland.start", function()
 	    hl.exec_cmd("waybar")
         hl.exec_cmd("bash " .. HOME .. "/.local/share/Hypr-Trinity/config/hypr/configScripts/waybar-start.sh")
     	hl.exec_cmd("hypridle")
-    	hl.exec_cmd("custombtoplauncher")
-    	hl.exec_cmd("custombrightnessctl resetToDefault")
+    	hl.exec_cmd(BIN .. "custombtoplauncher")
+    	hl.exec_cmd(BIN .. "custombrightnessctl resetToDefault")
     	hl.exec_cmd("swaync")
 end)
 
@@ -218,15 +218,15 @@ hl.bind(mainMod .. " + RETURN", hl.dsp.exec_cmd(terminal))
 
 -- If the code:118 for ScrLk key is not working, try to make one your own custom keybind in your DE and use that keybind here instead. Use command 'wev' to find the keycode by looking at "key: 127; state: 1 (pressed)" for keyboard key or just use the letter it self
 hl.bind("code:118", hl.dsp.exec_cmd("hyprlock")) -- ScrLk to lock
-hl.bind(mainMod .. " + T", hl.dsp.exec_cmd("custombtoplauncher"))
+hl.bind(mainMod .. " + T", hl.dsp.exec_cmd(BIN .. "custombtoplauncher"))
 
 hl.bind(mainMod .. " + " .. shiftMod .. " + V", hl.dsp.exec_cmd("code"))
 hl.bind(mainMod .. " + " .. shiftMod .. " + O", hl.dsp.exec_cmd("obsidian"))
 hl.bind(mainMod .. " + " .. shiftMod .. " + F", hl.dsp.exec_cmd("zen"))
 hl.bind(mainMod .. " + " .. shiftMod .. " + E", hl.dsp.exec_cmd(fileManager))
 
-hl.bind(mainMod .. " + S", hl.dsp.exec_cmd("customwallpaperswitcher +"))
-hl.bind(mainMod .. " + " .. shiftMod .. " + S", hl.dsp.exec_cmd("customwallpaperswitcher -"))
+hl.bind(mainMod .. " + S", hl.dsp.exec_cmd(BIN .. "customwallpaperswitcher +"))
+hl.bind(mainMod .. " + " .. shiftMod .. " + S", hl.dsp.exec_cmd(BIN .. "customwallpaperswitcher -"))
 
 -- ---- Window control ----
 hl.bind(mainMod .. " + C", hl.dsp.window.close())
@@ -234,10 +234,10 @@ hl.bind(mainMod .. " + X", hl.dsp.window.float({ action = "toggle" }))
 hl.bind(mainMod .. " + P", hl.dsp.window.pseudo())
 hl.bind(mainMod .. " + J", hl.dsp.layout("togglesplit")) -- dwindle only
 hl.bind(mainMod .. " + SPACE", hl.dsp.exec_cmd(menu))
-hl.bind(mainMod .. " + Escape", hl.dsp.exec_cmd("customhyprlandexit"))
+hl.bind(mainMod .. " + Escape", hl.dsp.exec_cmd(BIN .. "customhyprlandexit"))
 hl.bind(mainMod .. " + " .. shiftMod .. " + Escape", hl.dsp.exit())
 
-hl.bind(ctrlMod .. " + " .. mainMod .. " + T", hl.dsp.exec_cmd("customwofisearch"))
+hl.bind(ctrlMod .. " + " .. mainMod .. " + T", hl.dsp.exec_cmd(BIN .. "customwofisearch"))
 
 -- ---- Config editing shortcuts ----
 hl.bind(mainMod .. " + " .. shiftMod .. " + H",
@@ -264,8 +264,8 @@ hl.bind(altMod .. "+" ..shiftMod.." + left", hl.dsp.exec_cmd("playerctl  positio
 hl.bind(altMod .. "+" ..shiftMod.." + right", hl.dsp.exec_cmd("playerctl position 10+"))
 
 -- ---- Brightness control ----
-hl.bind(ctrlMod .. " + " .. shiftMod .. " + B", hl.dsp.exec_cmd("custombrightnessctl + 5"))
-hl.bind(ctrlMod .. " + B", hl.dsp.exec_cmd("custombrightnessctl - 5"))
+hl.bind(ctrlMod .. " + " .. shiftMod .. " + B", hl.dsp.exec_cmd(BIN .. "custombrightnessctl + 5"))
+hl.bind(ctrlMod .. " + B", hl.dsp.exec_cmd(BIN .. "custombrightnessctl - 5"))
 
 -- ---- Screenshots (hyprshot) ----
 hl.bind("PRINT", hl.dsp.exec_cmd("hyprshot -m output"))

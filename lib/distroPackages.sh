@@ -21,8 +21,9 @@ installPackagesDebian() {
 		mpv \
 		curl \
 		rsync \
-		alacritty
-	
+		alacritty \
+		sassc
+
     	sudo apt autoremove -y
     	sudo apt clean
 }
@@ -45,7 +46,8 @@ installPackagesArch() {
 		xdg-desktop-portal-hyprland \
 		uwsm \
 		rsync \
-		alacritty
+		alacritty \
+		sassc
 
 		yayInstall
 }
@@ -70,7 +72,8 @@ installPackagesFedora() {
 		fuse-libs \
 		fuse \
 		rsync \
-		alacritty
+		alacritty \
+		sassc
 
 	sudo dnf clean all 
 }

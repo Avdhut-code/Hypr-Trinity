@@ -3,10 +3,11 @@
 
 local HOME = os.getenv("HOME")
 local ICONS = HOME .. "/.local/share/Hypr-Trinity/icon"
+local BIN = HOME .. "/.local/bin/"
 
 local function web_app_bind(key, url, icon)
     hl.bind("SUPER + SHIFT + " .. key,
-        hl.dsp.exec_cmd('customlinkopenr "' .. url .. '" "' .. ICONS .. "/" .. icon .. '"'))
+    hl.dsp.exec_cmd('"' .. BIN .. '"customlinkopenr "' .. url .. '" "' .. ICONS .. "/" .. icon .. '"'))
 end
 
 web_app_bind("Y", "https://www.youtube.com/",             "youtube.png")

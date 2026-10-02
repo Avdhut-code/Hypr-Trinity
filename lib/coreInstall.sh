@@ -97,12 +97,6 @@ simlinkCreate() {
 	chmod +x "${TARGET_DIR}/bin/custombrightnessctl.sh"      
 	chmod +x "${TARGET_DIR}/bin/customwallpaperswitcher.sh"      
 
-	log_info "GTK theme:"
-
-	mkdir -p "${HOME}/.local/share/themes"
-
-	ln -sfn "${TARGET_DIR}/themes/gtkThemes/Graphite-Dark" "${HOME}/.local/share/themes/"
-
 	log_success "Created symlink(s)"
 }
 
@@ -158,4 +152,40 @@ fontInstall() {
 	else
 		log_warning "Failed to download font"
 	fi
+}
+
+themeInstall() {
+    log_section "Installing Graphite GTK Theme"
+
+    local url="https://github.com/vinceliuice/Graphite-gtk-theme.git"
+    local tmp_path="/tmp/Graphite"
+    local target_theme_dir="${HOME}/.local/share/themes"
+
+    if [ -d "${TARGET_DIR}/themes/Graphite-Dark-compact" ]; then
+	        log_success "Graphite theme already installed, skipping."
+	        return
+    fi
+
+    mkdir -p "${TARGET_DIR}/themes/"
+
+    log_info "Cloning Graphite-gtk-theme..."
+
+    if git clone "${url}" "${tmp_path}" 2>/dev/null; then
+
+        	chmod +x "${tmp_path}/install.sh"
+
+        	log_info "Building theme..."
+
+        	"${tmp_path}/install.sh" -d "${TARGET_DIR}/themes/" -t default -c dark -s compact --tweaks black --round 6px
+
+        	log_info "Symlinking to ~/.local/share/themes..."
+        	mkdir -p "${target_theme_dir}"
+
+        	ln -sfn "${TARGET_DIR}/themes/Graphite-Dark-compact" "${target_theme_dir}/Graphite-Dark-compact"
+
+        	rm -rf "${tmp_path}"
+        	log_success "Graphite theme installed"
+    else
+ 	       log_warning "Failed to clone Graphite-gtk-theme"
+    fi
 }
