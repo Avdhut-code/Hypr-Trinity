@@ -110,8 +110,8 @@ bashAppend() {
 		return
 	fi
 
-	if [ -f "$ORIGINAL_DIR/bashAppend.sh" ]; then
-		cat "$ORIGINAL_DIR/bashAppend.sh" >> "${HOME}/.bashrc"
+	if [ -f "$ORIGINAL_DIR/lib/bashAppend.sh" ]; then
+		cat "$ORIGINAL_DIR/lib/bashAppend.sh" >> "${HOME}/.bashrc"
 		log_success ".bashrc configured with path export and environment variables"
 	else
 		log_warning "bashAppend.sh not found, skipping .bashrc modification"
